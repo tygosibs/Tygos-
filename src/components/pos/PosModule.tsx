@@ -25,9 +25,11 @@ import {
 import { MOCK_MENU_ITEMS, MOCK_TABLES } from '../../data/mockData.ts';
 import { MenuItem, OrderItem, PosOrderMode, PosTable, TableStatus } from '../../types/index.ts';
 import { useSync } from '../../sync/SyncContext.tsx';
+import { useI18n } from '../../i18n/I18nContext.tsx';
 
 export const PosModule: React.FC = () => {
   const { addMockChange, isOnline } = useSync();
+  const { t, formatCurrency, formatNumber, isRtl } = useI18n();
 
   const [mode, setMode] = useState<PosOrderMode>('dine_in');
   const [selectedSection, setSelectedSection] = useState<string>('All');
@@ -147,7 +149,7 @@ export const PosModule: React.FC = () => {
             }`}
           >
             <Utensils className="w-4 h-4" />
-            <span>Dine In (Floor Plan)</span>
+            <span>{t('pos.dineIn')}</span>
           </button>
           <button
             onClick={() => setMode('take_away')}
@@ -158,7 +160,7 @@ export const PosModule: React.FC = () => {
             }`}
           >
             <ShoppingBag className="w-4 h-4" />
-            <span>Take Away</span>
+            <span>{t('pos.takeAway')}</span>
           </button>
           <button
             onClick={() => setMode('delivery')}
@@ -169,21 +171,21 @@ export const PosModule: React.FC = () => {
             }`}
           >
             <Truck className="w-4 h-4" />
-            <span>Delivery & Courier</span>
+            <span>{t('pos.delivery')}</span>
           </button>
         </div>
 
         <div className="flex items-center gap-3 text-xs">
           {mode === 'dine_in' && selectedTable && (
             <div className="flex items-center gap-2 px-3 py-1.5 bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-500/30 rounded-lg text-cyan-700 dark:text-cyan-300">
-              <span className="font-bold">Active Table:</span>
-              <span className="font-mono font-bold text-sm">{selectedTable.tableNumber}</span>
+              <span className="font-bold">{t('pos.activeTable')}</span>
+              <span className="font-mono font-bold text-sm" dir="ltr">{selectedTable.tableNumber}</span>
               <span className="text-slate-500">· {selectedTable.section}</span>
             </div>
           )}
           {!isOnline && (
             <span className="px-2.5 py-1 text-xs font-semibold bg-amber-500/10 text-amber-500 border border-amber-500/30 rounded-lg">
-              Offline Terminal Mode Active
+              {t('common.offlineBanner')}
             </span>
           )}
         </div>
@@ -193,13 +195,13 @@ export const PosModule: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Left Column: Visual Table Management (Dine In) OR Category & Product Grid */}
         <div className="lg:col-span-8 space-y-4">
-          {/* Table Management View (if Dine In mode is open and tables section is toggled) */}
+          {/* Table Management View */}
           {mode === 'dine_in' && (
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-xl shadow-xs">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
                 <div className="flex items-center gap-2">
                   <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Floor Plan Zones
+                    {t('pos.floorPlan')}
                   </h3>
                   <span className="text-[10px] text-slate-400">({MOCK_TABLES.length} tables total)</span>
                 </div>
@@ -214,7 +216,7 @@ export const PosModule: React.FC = () => {
                           : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-white'
                       }`}
                     >
-                      {sec}
+                      {sec === 'All' ? t('common.all') : sec}
                     </button>
                   ))}
                 </div>
@@ -263,23 +265,23 @@ export const PosModule: React.FC = () => {
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-base font-black font-mono text-slate-900 dark:text-white">
+                        <span className="text-base font-black font-mono text-slate-900 dark:text-white" dir="ltr">
                           {tbl.tableNumber}
                         </span>
-                        <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-white/60 dark:bg-black/30">
+                        <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-white/60 dark:bg-black/30 font-mono" dir="ltr">
                           {tbl.capacity}p
                         </span>
                       </div>
 
-                      <div className="mt-2 text-left">
+                      <div className="mt-2 text-start">
                         <div className="text-[11px] font-semibold truncate text-slate-800 dark:text-slate-200">
-                          {tbl.customerName || (tbl.status === 'available' ? 'Available' : 'Reserved')}
+                          {tbl.customerName || (tbl.status === 'available' ? t('dashboard.available') : 'Reserved')}
                         </div>
                         <div className="flex items-center justify-between mt-1 text-[10px] text-slate-500">
-                          <span>{tbl.waiter || tbl.status}</span>
+                          <span>{tbl.waiter || (tbl.status === 'occupied' ? t('dashboard.occupied') : tbl.status === 'waiting_payment' ? t('dashboard.waitingPayment') : t('dashboard.available'))}</span>
                           {tbl.orderTotal && (
-                            <span className="font-mono font-bold text-cyan-600 dark:text-cyan-400">
-                              ${tbl.orderTotal.toFixed(0)}
+                            <span className="font-mono font-bold text-cyan-600 dark:text-cyan-400" dir="ltr">
+                              {formatCurrency(tbl.orderTotal)}
                             </span>
                           )}
                         </div>
@@ -305,19 +307,19 @@ export const PosModule: React.FC = () => {
                         : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-white'
                     }`}
                   >
-                    {cat}
+                    {cat === 'All' ? t('common.all') : cat}
                   </button>
                 ))}
               </div>
 
               <div className="relative w-full sm:w-56">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                <Search className="w-4 h-4 text-slate-400 absolute start-3 top-2.5" />
                 <input
                   type="text"
-                  placeholder="Fast PLU / search..."
+                  placeholder={t('pos.fastSearch')}
                   value={itemSearch}
                   onChange={(e) => setItemSearch(e.target.value)}
-                  className="w-full pl-9 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-cyan-500"
+                  className="w-full ps-9 pe-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-cyan-500"
                 />
               </div>
             </div>
@@ -332,7 +334,7 @@ export const PosModule: React.FC = () => {
                 >
                   <div>
                     <div className="flex items-start justify-between gap-1 mb-1">
-                      <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 group-hover:text-cyan-400 transition-colors">
+                      <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 group-hover:text-cyan-500 transition-colors">
                         {prod.name}
                       </h4>
                       <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 shrink-0">
@@ -345,10 +347,10 @@ export const PosModule: React.FC = () => {
                   </div>
 
                   <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-200 dark:border-slate-800/60">
-                    <span className="text-sm font-extrabold font-mono text-cyan-600 dark:text-cyan-400">
-                      ${prod.sellingPrice.toFixed(2)}
+                    <span className="text-sm font-extrabold font-mono text-cyan-600 dark:text-cyan-400" dir="ltr">
+                      {formatCurrency(prod.sellingPrice)}
                     </span>
-                    <button className="w-7 h-7 rounded-lg bg-cyan-600/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center group-hover:bg-cyan-600 group-hover:text-white transition-colors">
+                    <button className="w-7 h-7 rounded-lg bg-cyan-600/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center group-hover:bg-cyan-600 group-hover:text-white transition-colors cursor-pointer">
                       <Plus className="w-4 h-4" />
                     </button>
                   </div>
@@ -365,27 +367,27 @@ export const PosModule: React.FC = () => {
             <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
               <div>
                 <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-                  Current Order
+                  {t('pos.currentOrder')}
                 </h3>
                 <p className="text-[11px] text-slate-500">
-                  Ticket #{selectedTable?.currentOrderId || 'ORD-942'} · {mode.replace('_', ' ').toUpperCase()}
+                  {t('pos.ticketNumber')} #{selectedTable?.currentOrderId || 'ORD-942'} · {mode.replace('_', ' ').toUpperCase()}
                 </p>
               </div>
               <button
                 onClick={() => setCart([])}
                 className="text-xs text-rose-500 hover:text-rose-600 dark:hover:text-rose-400 font-medium cursor-pointer"
               >
-                Clear
+                {t('pos.clear')}
               </button>
             </div>
 
             {/* Cart Items List */}
-            <div className="my-3 space-y-2.5 max-h-80 overflow-y-auto pr-1">
+            <div className="my-3 space-y-2.5 max-h-80 overflow-y-auto pe-1">
               {cart.length === 0 ? (
                 <div className="py-12 text-center text-xs text-slate-400">
                   <Utensils className="w-8 h-8 text-slate-300 dark:text-slate-700 mx-auto mb-2" />
-                  <p>Order is empty.</p>
-                  <p className="text-[11px] text-slate-500">Select items from menu to add.</p>
+                  <p>{t('pos.emptyOrder')}</p>
+                  <p className="text-[11px] text-slate-500">{t('pos.selectItems')}</p>
                 </div>
               ) : (
                 cart.map((item) => (
@@ -404,19 +406,19 @@ export const PosModule: React.FC = () => {
                           </p>
                         )}
                       </div>
-                      <span className="font-mono font-bold text-slate-900 dark:text-slate-200 ml-2">
-                        ${item.totalPrice.toFixed(2)}
+                      <span className="font-mono font-bold text-slate-900 dark:text-slate-200 ms-2" dir="ltr">
+                        {formatCurrency(item.totalPrice)}
                       </span>
                     </div>
 
                     <div className="flex items-center justify-between mt-2 pt-1 border-t border-slate-200 dark:border-slate-800/60">
-                      <span className="text-[10px] text-slate-400 font-mono">
-                        ${item.unitPrice.toFixed(2)} ea
+                      <span className="text-[10px] text-slate-400 font-mono" dir="ltr">
+                        {formatCurrency(item.unitPrice)} ea
                       </span>
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => updateQuantity(item.productId, -1)}
-                          className="w-5 h-5 rounded bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center hover:bg-slate-300"
+                          className="w-5 h-5 rounded bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center hover:bg-slate-300 cursor-pointer"
                         >
                           <Minus className="w-3 h-3" />
                         </button>
@@ -425,7 +427,7 @@ export const PosModule: React.FC = () => {
                         </span>
                         <button
                           onClick={() => updateQuantity(item.productId, 1)}
-                          className="w-5 h-5 rounded bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center hover:bg-slate-300"
+                          className="w-5 h-5 rounded bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center hover:bg-slate-300 cursor-pointer"
                         >
                           <Plus className="w-3 h-3" />
                         </button>
@@ -440,21 +442,21 @@ export const PosModule: React.FC = () => {
           {/* Pricing Summary & Checkout Button */}
           <div className="pt-3 border-t border-slate-200 dark:border-slate-800 space-y-2 text-xs">
             <div className="flex justify-between text-slate-500">
-              <span>Subtotal</span>
-              <span className="font-mono text-slate-900 dark:text-white font-medium">
-                ${subtotal.toFixed(2)}
+              <span>{t('common.subtotal')}</span>
+              <span className="font-mono text-slate-900 dark:text-white font-medium" dir="ltr">
+                {formatCurrency(subtotal)}
               </span>
             </div>
             <div className="flex justify-between text-slate-500">
-              <span>VAT / Tax (14%)</span>
-              <span className="font-mono text-slate-900 dark:text-white font-medium">
-                ${tax.toFixed(2)}
+              <span>{t('common.tax')} (14%)</span>
+              <span className="font-mono text-slate-900 dark:text-white font-medium" dir="ltr">
+                {formatCurrency(tax)}
               </span>
             </div>
             <div className="flex justify-between text-base font-black text-slate-900 dark:text-white pt-2 border-t border-slate-200 dark:border-slate-800">
-              <span>Total Due</span>
-              <span className="font-mono text-cyan-600 dark:text-cyan-400">
-                ${total.toFixed(2)}
+              <span>{t('pos.totalDue')}</span>
+              <span className="font-mono text-cyan-600 dark:text-cyan-400" dir="ltr">
+                {formatCurrency(total)}
               </span>
             </div>
 
@@ -464,11 +466,11 @@ export const PosModule: React.FC = () => {
               className={`w-full py-3 rounded-xl font-bold text-sm text-slate-950 transition-all flex items-center justify-center gap-2 mt-2 ${
                 cart.length > 0
                   ? 'bg-gradient-to-r from-cyan-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 cursor-pointer shadow-md shadow-cyan-950/40'
-                  : 'bg-slate-800 text-slate-500 cursor-not-allowed opacity-60'
+                  : 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed opacity-60'
               }`}
             >
               <CreditCard className="w-4 h-4" />
-              <span>Charge & Settle (${total.toFixed(2)})</span>
+              <span>{t('pos.chargeAndSettle')} ({formatCurrency(total)})</span>
             </button>
           </div>
         </div>
@@ -480,11 +482,11 @@ export const PosModule: React.FC = () => {
           <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
               <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                Settle Payment
+                {t('pos.settlePayment')}
               </h3>
               <button
                 onClick={() => setPaymentModalOpen(false)}
-                className="text-slate-400 hover:text-white"
+                className="text-slate-400 hover:text-white cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -492,10 +494,10 @@ export const PosModule: React.FC = () => {
 
             <div className="my-4 text-center">
               <span className="text-xs text-slate-500 uppercase tracking-widest block">
-                Total Due
+                {t('pos.totalDue')}
               </span>
-              <span className="text-3xl font-black font-mono text-cyan-600 dark:text-cyan-400">
-                ${total.toFixed(2)}
+              <span className="text-3xl font-black font-mono text-cyan-600 dark:text-cyan-400" dir="ltr">
+                {formatCurrency(total)}
               </span>
             </div>
 
@@ -505,63 +507,63 @@ export const PosModule: React.FC = () => {
                 onClick={() => setPaymentMethod('card')}
                 className={`p-3 rounded-xl border flex flex-col items-center gap-1.5 transition-colors cursor-pointer ${
                   paymentMethod === 'card'
-                    ? 'border-cyan-500 bg-cyan-500/10 text-cyan-400 font-bold'
+                    ? 'border-cyan-500 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 font-bold'
                     : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
                 }`}
               >
                 <CreditCard className="w-5 h-5" />
-                <span>Credit / Debit Card</span>
+                <span>{t('pos.card')}</span>
               </button>
 
               <button
                 onClick={() => setPaymentMethod('cash')}
                 className={`p-3 rounded-xl border flex flex-col items-center gap-1.5 transition-colors cursor-pointer ${
                   paymentMethod === 'cash'
-                    ? 'border-cyan-500 bg-cyan-500/10 text-cyan-400 font-bold'
+                    ? 'border-cyan-500 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 font-bold'
                     : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
                 }`}
               >
                 <Banknote className="w-5 h-5" />
-                <span>Cash Register</span>
+                <span>{t('pos.cash')}</span>
               </button>
 
               <button
                 onClick={() => setPaymentMethod('split')}
                 className={`p-3 rounded-xl border flex flex-col items-center gap-1.5 transition-colors cursor-pointer ${
                   paymentMethod === 'split'
-                    ? 'border-cyan-500 bg-cyan-500/10 text-cyan-400 font-bold'
+                    ? 'border-cyan-500 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 font-bold'
                     : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
                 }`}
               >
                 <Split className="w-5 h-5" />
-                <span>Split Equal / By Seat</span>
+                <span>{t('pos.split')}</span>
               </button>
 
               <button
                 onClick={() => setPaymentMethod('room')}
                 className={`p-3 rounded-xl border flex flex-col items-center gap-1.5 transition-colors cursor-pointer ${
                   paymentMethod === 'room'
-                    ? 'border-cyan-500 bg-cyan-500/10 text-cyan-400 font-bold'
+                    ? 'border-cyan-500 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 font-bold'
                     : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
                 }`}
               >
                 <Building className="w-5 h-5" />
-                <span>Hotel Room Charge</span>
+                <span>{t('pos.room')}</span>
               </button>
             </div>
 
             <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex gap-2">
               <button
                 onClick={() => setPaymentModalOpen(false)}
-                className="w-1/3 py-2 text-xs font-semibold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 rounded-xl"
+                className="w-1/3 py-2 text-xs font-semibold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 rounded-xl cursor-pointer"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 onClick={handleCompleteOrder}
                 className="w-2/3 py-2.5 text-xs font-bold text-slate-950 bg-gradient-to-r from-cyan-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 rounded-xl shadow-md cursor-pointer"
               >
-                Confirm & Print Bill
+                {t('pos.confirmAndPrint')}
               </button>
             </div>
           </div>
@@ -576,30 +578,30 @@ export const PosModule: React.FC = () => {
               <CheckCircle className="w-6 h-6" />
             </div>
             <h3 className="text-base font-bold text-slate-900 dark:text-white">
-              Order Settle Complete
+              {t('pos.settleSuccess')}
             </h3>
             <p className="text-xs text-slate-500 mt-1 mb-4">
-              Invoice generated & recipe inventory depletion triggered.
+              Tygos POS · {t('common.phase2Badge')}
             </p>
-            <div className="p-3 bg-slate-50 dark:bg-slate-950 rounded-lg text-left text-xs space-y-1 font-mono mb-4">
+            <div className="p-3 bg-slate-50 dark:bg-slate-950 rounded-lg text-start text-xs space-y-1 font-mono mb-4">
               <div className="flex justify-between text-slate-400">
-                <span>Total Settled:</span>
-                <span className="text-emerald-400">${total.toFixed(2)}</span>
+                <span>{t('common.total')}:</span>
+                <span className="text-emerald-500 dark:text-emerald-400" dir="ltr">{formatCurrency(total)}</span>
               </div>
               <div className="flex justify-between text-slate-400">
-                <span>Method:</span>
-                <span className="text-slate-200">{paymentMethod.toUpperCase()}</span>
+                <span>{t('pos.settlePayment')}:</span>
+                <span className="text-slate-700 dark:text-slate-200">{paymentMethod.toUpperCase()}</span>
               </div>
               <div className="flex justify-between text-slate-400">
                 <span>E-Invoice:</span>
-                <span className="text-cyan-400">#TYG-INV-9921</span>
+                <span className="text-cyan-500 dark:text-cyan-400" dir="ltr">#TYG-INV-9921</span>
               </div>
             </div>
             <button
               onClick={() => setOrderSuccessModal(false)}
-              className="w-full py-2.5 bg-slate-900 dark:bg-slate-800 text-white rounded-xl text-xs font-bold hover:bg-slate-750"
+              className="w-full py-2.5 bg-slate-900 dark:bg-slate-800 text-white rounded-xl text-xs font-bold hover:bg-slate-750 cursor-pointer"
             >
-              Ready for Next Order
+              {t('pos.readyNext')}
             </button>
           </div>
         </div>

@@ -4,12 +4,21 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Search, X, Utensils, Users, Building, Package, DollarSign, ArrowRight } from 'lucide-react';
+import { Search, X, Utensils, Users, Building, Package, DollarSign, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.tsx';
-import { MOCK_MENU_ITEMS, MOCK_CUSTOMERS, MOCK_SUPPLIERS, MOCK_EMPLOYEES, MOCK_ESTABLISHMENTS } from '../../data/mockData.ts';
+import { useI18n } from '../../i18n/I18nContext.tsx';
+import { formatCurrency } from '../../i18n/formatters.ts';
+import {
+  MOCK_MENU_ITEMS,
+  MOCK_CUSTOMERS,
+  MOCK_SUPPLIERS,
+  MOCK_EMPLOYEES,
+  MOCK_ESTABLISHMENTS,
+} from '../../data/mockData.ts';
 
 export const GlobalSearchModal: React.FC = () => {
   const { isSearchOpen, setIsSearchOpen, setActiveView } = useAuth();
+  const { t, language, dir } = useI18n();
   const [query, setQuery] = useState('');
 
   useEffect(() => {
@@ -52,6 +61,8 @@ export const GlobalSearchModal: React.FC = () => {
     setQuery('');
   };
 
+  const ArrowIcon = dir === 'rtl' ? ArrowLeft : ArrowRight;
+
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4 bg-slate-950/70 backdrop-blur-sm animate-fade-in">
       <div className="w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-xl shadow-2xl overflow-hidden flex flex-col text-slate-100">
@@ -60,7 +71,7 @@ export const GlobalSearchModal: React.FC = () => {
           <Search className="w-5 h-5 text-cyan-400 shrink-0" />
           <input
             type="text"
-            placeholder="Search across Products, Recipes, Guests, Suppliers, Invoices, Accounts..."
+            placeholder={t('search.placeholder', 'Search across Products, Recipes, Guests, Suppliers, Invoices, Accounts...')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             autoFocus
@@ -69,13 +80,13 @@ export const GlobalSearchModal: React.FC = () => {
           {query && (
             <button
               onClick={() => setQuery('')}
-              className="p-1 text-slate-400 hover:text-white rounded"
+              className="p-1 text-slate-400 hover:text-white rounded cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
           )}
-          <span className="text-[10px] text-slate-500 border border-slate-700 px-1.5 py-0.5 rounded font-mono">
-            ESC
+          <span className="text-[10px] text-slate-500 border border-slate-700 px-1.5 py-0.5 rounded font-mono" dir="ltr">
+            {t('search.pressEsc', 'ESC')}
           </span>
         </div>
 
@@ -85,43 +96,43 @@ export const GlobalSearchModal: React.FC = () => {
           {!query && (
             <div className="py-2">
               <span className="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-2 block">
-                Quick Navigation Shortcuts
+                {t('search.shortcuts', 'Quick Navigation Shortcuts')}
               </span>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 <button
                   onClick={() => navigateTo('pos')}
-                  className="flex items-center gap-2.5 p-2 rounded-lg bg-slate-800/60 hover:bg-slate-800 text-xs text-left transition-colors"
+                  className="flex items-center gap-2.5 p-2 rounded-lg bg-slate-800/60 hover:bg-slate-800 text-xs text-start transition-colors cursor-pointer"
                 >
-                  <Utensils className="w-4 h-4 text-cyan-400" />
-                  <span>Point of Sale</span>
+                  <Utensils className="w-4 h-4 text-cyan-400 shrink-0" />
+                  <span>{t('navigation.pos', 'Point of Sale')}</span>
                 </button>
                 <button
                   onClick={() => navigateTo('cost_control')}
-                  className="flex items-center gap-2.5 p-2 rounded-lg bg-slate-800/60 hover:bg-slate-800 text-xs text-left transition-colors"
+                  className="flex items-center gap-2.5 p-2 rounded-lg bg-slate-800/60 hover:bg-slate-800 text-xs text-start transition-colors cursor-pointer"
                 >
-                  <DollarSign className="w-4 h-4 text-emerald-400" />
-                  <span>Cost Control</span>
+                  <DollarSign className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>{t('navigation.costControl', 'Cost Control')}</span>
                 </button>
                 <button
                   onClick={() => navigateTo('inventory')}
-                  className="flex items-center gap-2.5 p-2 rounded-lg bg-slate-800/60 hover:bg-slate-800 text-xs text-left transition-colors"
+                  className="flex items-center gap-2.5 p-2 rounded-lg bg-slate-800/60 hover:bg-slate-800 text-xs text-start transition-colors cursor-pointer"
                 >
-                  <Package className="w-4 h-4 text-amber-400" />
-                  <span>Inventory Warehouses</span>
+                  <Package className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span>{t('navigation.inventory', 'Inventory Warehouses')}</span>
                 </button>
                 <button
                   onClick={() => navigateTo('crm')}
-                  className="flex items-center gap-2.5 p-2 rounded-lg bg-slate-800/60 hover:bg-slate-800 text-xs text-left transition-colors"
+                  className="flex items-center gap-2.5 p-2 rounded-lg bg-slate-800/60 hover:bg-slate-800 text-xs text-start transition-colors cursor-pointer"
                 >
-                  <Users className="w-4 h-4 text-blue-400" />
-                  <span>Guest Directory</span>
+                  <Users className="w-4 h-4 text-blue-400 shrink-0" />
+                  <span>{t('crm.guestDirectory', 'Guest Directory')}</span>
                 </button>
                 <button
                   onClick={() => navigateTo('super_admin')}
-                  className="flex items-center gap-2.5 p-2 rounded-lg bg-slate-800/60 hover:bg-slate-800 text-xs text-left transition-colors"
+                  className="flex items-center gap-2.5 p-2 rounded-lg bg-slate-800/60 hover:bg-slate-800 text-xs text-start transition-colors cursor-pointer"
                 >
-                  <Building className="w-4 h-4 text-purple-400" />
-                  <span>Super Admin Center</span>
+                  <Building className="w-4 h-4 text-purple-400 shrink-0" />
+                  <span>{t('admin.controlCenter', 'Super Admin Center')}</span>
                 </button>
               </div>
             </div>
@@ -131,7 +142,7 @@ export const GlobalSearchModal: React.FC = () => {
           {matchedProducts.length > 0 && (
             <div className="pt-3">
               <span className="text-xs uppercase tracking-wider text-cyan-400 font-semibold mb-2 block">
-                Menu & Recipes ({matchedProducts.length})
+                {t('search.menuRecipes', 'Menu & Recipes')} ({matchedProducts.length})
               </span>
               <div className="space-y-1">
                 {matchedProducts.slice(0, 3).map((item) => (
@@ -143,12 +154,14 @@ export const GlobalSearchModal: React.FC = () => {
                     <div>
                       <p className="font-medium text-slate-200">{item.name}</p>
                       <p className="text-[11px] text-slate-400">
-                        {item.category} · Dept: {item.department} · Food Cost: {item.foodCostPercentage}%
+                        {item.category} · {item.department}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-cyan-300">${item.sellingPrice.toFixed(2)}</span>
-                      <ArrowRight className="w-3.5 h-3.5 text-slate-500" />
+                      <span className="font-mono text-cyan-300" dir="ltr">
+                        {formatCurrency(item.sellingPrice, language)}
+                      </span>
+                      <ArrowIcon className="w-3.5 h-3.5 text-slate-500" />
                     </div>
                   </div>
                 ))}
@@ -160,7 +173,7 @@ export const GlobalSearchModal: React.FC = () => {
           {matchedCustomers.length > 0 && (
             <div className="pt-3">
               <span className="text-xs uppercase tracking-wider text-blue-400 font-semibold mb-2 block">
-                Guests & CRM ({matchedCustomers.length})
+                {t('search.guestsCrm', 'Guests & CRM')} ({matchedCustomers.length})
               </span>
               <div className="space-y-1">
                 {matchedCustomers.slice(0, 3).map((c) => (
@@ -170,12 +183,14 @@ export const GlobalSearchModal: React.FC = () => {
                     className="flex items-center justify-between p-2 rounded-md hover:bg-slate-800 cursor-pointer text-xs"
                   >
                     <div>
-                      <p className="font-medium text-slate-200">{c.name} ({c.code})</p>
+                      <p className="font-medium text-slate-200">
+                        {c.name} <span className="font-mono text-cyan-400" dir="ltr">({c.code})</span>
+                      </p>
                       <p className="text-[11px] text-slate-400">
-                        Tier: {c.loyaltyTier} · Lifetime Spend: ${c.totalSpent.toLocaleString()}
+                        {c.loyaltyTier} · {formatCurrency(c.totalSpent, language)}
                       </p>
                     </div>
-                    <ArrowRight className="w-3.5 h-3.5 text-slate-500" />
+                    <ArrowIcon className="w-3.5 h-3.5 text-slate-500" />
                   </div>
                 ))}
               </div>
@@ -186,7 +201,7 @@ export const GlobalSearchModal: React.FC = () => {
           {matchedEsts.length > 0 && (
             <div className="pt-3">
               <span className="text-xs uppercase tracking-wider text-purple-400 font-semibold mb-2 block">
-                Establishments ({matchedEsts.length})
+                {t('search.establishments', 'Establishments')} ({matchedEsts.length})
               </span>
               <div className="space-y-1">
                 {matchedEsts.slice(0, 3).map((est) => (
@@ -197,13 +212,13 @@ export const GlobalSearchModal: React.FC = () => {
                   >
                     <div>
                       <p className="font-medium text-slate-200">
-                        {est.name} <span className="font-mono text-cyan-300">[{est.code}]</span>
+                        {est.name} <span className="font-mono text-cyan-300" dir="ltr">[{est.code}]</span>
                       </p>
                       <p className="text-[11px] text-slate-400">
-                        {est.city}, {est.country} · {est.businessType} · {est.status}
+                        {est.city}, {est.country} · {est.businessType}
                       </p>
                     </div>
-                    <ArrowRight className="w-3.5 h-3.5 text-slate-500" />
+                    <ArrowIcon className="w-3.5 h-3.5 text-slate-500" />
                   </div>
                 ))}
               </div>
@@ -213,8 +228,8 @@ export const GlobalSearchModal: React.FC = () => {
 
         {/* Footer */}
         <div className="px-4 py-2 bg-slate-950/60 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500">
-          <span>Tip: Press Cmd+K anywhere to launch search</span>
-          <span className="text-cyan-400 font-medium">Tygos Unified Intelligence</span>
+          <span>{t('search.footerTip', 'Tip: Press ⌘K anywhere to launch search')}</span>
+          <span className="text-cyan-400 font-medium">{t('search.engineName', 'Tygos Unified Intelligence')}</span>
         </div>
       </div>
     </div>

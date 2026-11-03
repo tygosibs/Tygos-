@@ -20,8 +20,11 @@ import {
 } from 'lucide-react';
 import { MOCK_MENU_ITEMS } from '../../data/mockData.ts';
 import { MenuItem, ProductionDepartment } from '../../types/index.ts';
+import { useI18n } from '../../i18n/I18nContext.tsx';
 
 export const MenuRecipeModule: React.FC = () => {
+  const { t, formatCurrency, formatNumber } = useI18n();
+
   const [selectedDepartment, setSelectedDepartment] = useState<string>('All');
   const [selectedProduct, setSelectedProduct] = useState<MenuItem>(MOCK_MENU_ITEMS[0]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -60,17 +63,17 @@ export const MenuRecipeModule: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-            Menu Engineering & Recipe Management
+            {t('menu.title')}
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Production departments, Bill of Materials (BOM), ingredient unit costs, and real-time margin analytics.
+            {t('menu.subtitle')}
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <button className="px-3.5 py-2 text-xs font-semibold rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white transition-colors flex items-center gap-1.5 cursor-pointer">
             <Plus className="w-4 h-4" />
-            <span>Create New Recipe</span>
+            <span>{t('menu.newRecipe')}</span>
           </button>
         </div>
       </div>
@@ -87,7 +90,7 @@ export const MenuRecipeModule: React.FC = () => {
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
-            {dept} {dept !== 'All' ? 'Department' : 'Stations'}
+            {dept === 'All' ? t('menu.allStations') : dept}
           </button>
         ))}
       </div>
@@ -97,17 +100,17 @@ export const MenuRecipeModule: React.FC = () => {
         {/* Left Column: Product Catalog */}
         <div className="lg:col-span-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-xs space-y-3">
           <div className="relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+            <Search className="w-4 h-4 text-slate-400 absolute start-3 top-2.5" />
             <input
               type="text"
-              placeholder="Filter products by name or barcode..."
+              placeholder={t('common.search')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-cyan-500"
+              className="w-full ps-9 pe-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-cyan-500"
             />
           </div>
 
-          <div className="space-y-2 max-h-[640px] overflow-y-auto pr-1">
+          <div className="space-y-2 max-h-[640px] overflow-y-auto pe-1">
             {filteredProducts.map((p) => {
               const isSelected = selectedProduct.id === p.id;
               return (
@@ -126,17 +129,17 @@ export const MenuRecipeModule: React.FC = () => {
                         {p.name}
                       </h4>
                       <p className="text-[11px] text-slate-500">
-                        {p.category} · Dept: {p.department}
+                        {p.category} · {p.department}
                       </p>
                     </div>
-                    <span className="font-mono font-black text-xs text-cyan-600 dark:text-cyan-400">
-                      ${p.sellingPrice.toFixed(2)}
+                    <span className="font-mono font-black text-xs text-cyan-600 dark:text-cyan-400" dir="ltr">
+                      {formatCurrency(p.sellingPrice)}
                     </span>
                   </div>
 
                   <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-800/60 text-[11px]">
                     <span className="text-slate-400">
-                      BOM Cost: <strong className="font-mono text-slate-700 dark:text-slate-300">${p.recipeCost.toFixed(2)}</strong>
+                      BOM: <strong className="font-mono text-slate-700 dark:text-slate-300" dir="ltr">{formatCurrency(p.recipeCost)}</strong>
                     </span>
                     <span
                       className={`font-mono font-bold ${
@@ -145,7 +148,7 @@ export const MenuRecipeModule: React.FC = () => {
                           : 'text-amber-500'
                       }`}
                     >
-                      Food Cost {p.foodCostPercentage}%
+                      {t('menu.foodCost')} {p.foodCostPercentage}%
                     </span>
                   </div>
                 </div>
@@ -163,25 +166,24 @@ export const MenuRecipeModule: React.FC = () => {
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white">
                   {selectedProduct.name}
                 </h3>
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-cyan-500/10 text-cyan-500 border border-cyan-500/20 font-bold">
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-cyan-500/10 text-cyan-500 border border-cyan-500/20 font-bold" dir="ltr">
                   {selectedProduct.barcode}
                 </span>
               </div>
               <p className="text-xs text-slate-500 mt-1">
-                Category: <strong>{selectedProduct.category}</strong> · Station:{' '}
-                <strong>{selectedProduct.department}</strong> · Unit: {selectedProduct.unit}
+                {selectedProduct.category} · {selectedProduct.department} · {t('common.unit')}: {selectedProduct.unit}
               </p>
             </div>
 
             <div className="flex items-center gap-1.5 text-xs text-slate-400">
               <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800">
-                Dine In: {selectedProduct.availableDineIn ? '✓' : '✗'}
+                {t('pos.dineIn')}: {selectedProduct.availableDineIn ? '✓' : '✗'}
               </span>
               <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800">
-                Take Away: {selectedProduct.availableTakeAway ? '✓' : '✗'}
+                {t('pos.takeAway')}: {selectedProduct.availableTakeAway ? '✓' : '✗'}
               </span>
               <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800">
-                Delivery: {selectedProduct.availableDelivery ? '✓' : '✗'}
+                {t('pos.delivery')}: {selectedProduct.availableDelivery ? '✓' : '✗'}
               </span>
             </div>
           </div>
@@ -189,28 +191,28 @@ export const MenuRecipeModule: React.FC = () => {
           {/* Financial Metrics Cards */}
           <div className="grid grid-cols-3 gap-3">
             <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-center">
-              <span className="text-[11px] text-slate-500 block">Selling Price</span>
-              <span className="text-lg font-black font-mono text-slate-900 dark:text-white">
-                ${selectedProduct.sellingPrice.toFixed(2)}
+              <span className="text-[11px] text-slate-500 block">{t('menu.sellingPrice')}</span>
+              <span className="text-lg font-black font-mono text-slate-900 dark:text-white" dir="ltr">
+                {formatCurrency(selectedProduct.sellingPrice)}
               </span>
               <span className="text-[10px] text-slate-400 block mt-0.5">+14% VAT incl.</span>
             </div>
 
             <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-center">
-              <span className="text-[11px] text-slate-500 block">Total Recipe Cost</span>
-              <span className="text-lg font-black font-mono text-amber-500">
-                ${selectedProduct.recipeCost.toFixed(2)}
+              <span className="text-[11px] text-slate-500 block">{t('menu.totalRecipeCost')}</span>
+              <span className="text-lg font-black font-mono text-amber-500" dir="ltr">
+                {formatCurrency(selectedProduct.recipeCost)}
               </span>
-              <span className="text-[10px] text-slate-400 block mt-0.5">Ingredient BOM</span>
+              <span className="text-[10px] text-slate-400 block mt-0.5">BOM Cost</span>
             </div>
 
             <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-center">
-              <span className="text-[11px] text-slate-500 block">Food Cost % / Margin</span>
+              <span className="text-[11px] text-slate-500 block">{t('menu.foodCost')} / {t('menu.grossMargin')}</span>
               <span className="text-lg font-black font-mono text-emerald-500">
                 {selectedProduct.foodCostPercentage}%
               </span>
               <span className="text-[10px] text-emerald-400 font-semibold block mt-0.5">
-                {grossProfitMargin}% Gross Margin
+                {grossProfitMargin}% {t('menu.grossMargin')}
               </span>
             </div>
           </div>
@@ -220,22 +222,22 @@ export const MenuRecipeModule: React.FC = () => {
             <div className="flex items-center justify-between mb-2">
               <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                 <ChefHat className="w-4 h-4 text-cyan-400" />
-                <span>Ingredients Bill of Materials (Per 1 Portion)</span>
+                <span>{t('menu.bomTitle')}</span>
               </h4>
               <span className="text-[11px] text-slate-400">
-                {selectedProduct.recipe.length} raw ingredients
+                {selectedProduct.recipe.length} ingredients
               </span>
             </div>
 
             <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
-              <table className="w-full text-left text-xs">
+              <table className="w-full text-start text-xs">
                 <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 border-b border-slate-200 dark:border-slate-800 font-semibold">
                   <tr>
-                    <th className="py-2.5 px-3">Ingredient</th>
-                    <th className="py-2.5 px-3 text-right">Qty</th>
-                    <th className="py-2.5 px-3">Unit</th>
-                    <th className="py-2.5 px-3 text-right">Portion Cost</th>
-                    <th className="py-2.5 px-3 text-right">Cost Share</th>
+                    <th className="py-2.5 px-3 text-start">{t('menu.ingredient')}</th>
+                    <th className="py-2.5 px-3 text-end">{t('menu.qty')}</th>
+                    <th className="py-2.5 px-3 text-start">{t('common.unit')}</th>
+                    <th className="py-2.5 px-3 text-end">{t('menu.portionCost')}</th>
+                    <th className="py-2.5 px-3 text-end">{t('menu.costShare')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
@@ -246,19 +248,19 @@ export const MenuRecipeModule: React.FC = () => {
                         : '0';
                     return (
                       <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-950/40">
-                        <td className="py-2.5 px-3 font-medium text-slate-900 dark:text-slate-200">
+                        <td className="py-2.5 px-3 font-medium text-slate-900 dark:text-slate-200 text-start">
                           {ing.ingredientName}
                         </td>
-                        <td className="py-2.5 px-3 text-right font-mono text-slate-700 dark:text-slate-300">
+                        <td className="py-2.5 px-3 text-end font-mono text-slate-700 dark:text-slate-300" dir="ltr">
                           {ing.quantity}
                         </td>
-                        <td className="py-2.5 px-3 text-slate-500 font-mono">
+                        <td className="py-2.5 px-3 text-slate-500 font-mono text-start">
                           {ing.unit}
                         </td>
-                        <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900 dark:text-white">
-                          ${ing.cost.toFixed(2)}
+                        <td className="py-2.5 px-3 text-end font-mono font-bold text-slate-900 dark:text-white" dir="ltr">
+                          {formatCurrency(ing.cost)}
                         </td>
-                        <td className="py-2.5 px-3 text-right font-mono text-cyan-600 dark:text-cyan-400">
+                        <td className="py-2.5 px-3 text-end font-mono text-cyan-600 dark:text-cyan-400">
                           {costShare}%
                         </td>
                       </tr>
@@ -273,7 +275,7 @@ export const MenuRecipeModule: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
             <div>
               <span className="text-xs font-semibold text-slate-500 block mb-1">
-                Approved POS Modifiers
+                {t('menu.modifiers')}
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {selectedProduct.modifiers.map((m, i) => (
@@ -289,7 +291,7 @@ export const MenuRecipeModule: React.FC = () => {
 
             <div>
               <span className="text-xs font-semibold text-slate-500 block mb-1">
-                Chef Preparation Directive
+                {t('menu.chefNotes')}
               </span>
               <p className="text-xs text-slate-600 dark:text-slate-400 italic bg-slate-50 dark:bg-slate-950/40 p-2 rounded-lg border border-slate-200 dark:border-slate-800/60">
                 {selectedProduct.notes || 'Standard culinary station standard operating procedure.'}

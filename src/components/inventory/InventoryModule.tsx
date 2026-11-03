@@ -20,9 +20,11 @@ import {
 import { MOCK_STOCK_BALANCES, MOCK_WAREHOUSES } from '../../data/mockData.ts';
 import { StockBalanceItem, Warehouse } from '../../types/index.ts';
 import { useSync } from '../../sync/SyncContext.tsx';
+import { useI18n } from '../../i18n/I18nContext.tsx';
 
 export const InventoryModule: React.FC = () => {
   const { addMockChange } = useSync();
+  const { t, formatCurrency, formatNumber } = useI18n();
 
   const [selectedWarehouseId, setSelectedWarehouseId] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -65,10 +67,10 @@ export const InventoryModule: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-            Inventory & Warehouse Management
+            {t('inventory.title')}
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Multi-store tracking, theoretical vs book vs physical stock balances, transfers, and valuation.
+            {t('inventory.subtitle')}
           </p>
         </div>
 
@@ -78,15 +80,15 @@ export const InventoryModule: React.FC = () => {
             className="px-3.5 py-2 text-xs font-semibold rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white transition-colors flex items-center gap-1.5 cursor-pointer"
           >
             <ArrowRightLeft className="w-4 h-4" />
-            <span>Transfer Between Warehouses</span>
+            <span>{t('inventory.transfer')}</span>
           </button>
         </div>
       </div>
 
       {toastMessage && (
-        <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs rounded-xl flex items-center justify-between animate-fade-in">
+        <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs rounded-xl flex items-center justify-between animate-fade-in">
           <span>{toastMessage}</span>
-          <button onClick={() => setToastMessage('')} className="text-slate-400 hover:text-white">
+          <button onClick={() => setToastMessage('')} className="text-slate-400 hover:text-white cursor-pointer">
             <X className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -105,10 +107,10 @@ export const InventoryModule: React.FC = () => {
             }`}
           >
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400" dir="ltr">
                 {wh.code}
               </span>
-              <Building className="w-4 h-4 text-cyan-400" />
+              <Building className="w-4 h-4 text-cyan-500" />
             </div>
 
             <h4 className="text-sm font-bold text-slate-900 dark:text-white mt-2">
@@ -118,8 +120,8 @@ export const InventoryModule: React.FC = () => {
 
             <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100 dark:border-slate-800/60 text-xs">
               <span className="text-slate-400">{wh.totalItems} Items</span>
-              <span className="font-mono font-bold text-slate-900 dark:text-slate-200">
-                ${wh.totalValue.toLocaleString()}
+              <span className="font-mono font-bold text-slate-900 dark:text-slate-200" dir="ltr">
+                {formatCurrency(wh.totalValue)}
               </span>
             </div>
           </div>
@@ -132,13 +134,13 @@ export const InventoryModule: React.FC = () => {
         <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2 flex-1 max-w-sm">
             <div className="relative w-full">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+              <Search className="w-4 h-4 text-slate-400 absolute start-3 top-2.5" />
               <input
                 type="text"
-                placeholder="Search raw item name or code..."
+                placeholder={t('common.search')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-cyan-500"
+                className="w-full ps-9 pe-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-cyan-500"
               />
             </div>
           </div>
@@ -146,31 +148,31 @@ export const InventoryModule: React.FC = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setSelectedWarehouseId('all')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg cursor-pointer ${
                 selectedWarehouseId === 'all'
                   ? 'bg-slate-900 text-white dark:bg-cyan-500 dark:text-slate-950'
                   : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
               }`}
             >
-              All Warehouses
+              {t('common.all')}
             </button>
           </div>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+          <table className="w-full text-start text-xs">
             <thead className="bg-slate-50 dark:bg-slate-950/60 text-slate-500 border-b border-slate-200 dark:border-slate-800 font-semibold">
               <tr>
-                <th className="py-3 px-4">Item Code</th>
-                <th className="py-3 px-4">Raw Material Name</th>
-                <th className="py-3 px-3">Warehouse</th>
-                <th className="py-3 px-3 text-right">Cost / Unit</th>
-                <th className="py-3 px-3 text-right">Theoretical Stock</th>
-                <th className="py-3 px-3 text-right">Book Stock</th>
-                <th className="py-3 px-3 text-right">Physical Count</th>
-                <th className="py-3 px-3 text-right">Variance</th>
-                <th className="py-3 px-3 text-right">Valuation</th>
-                <th className="py-3 px-4 text-center">Status</th>
+                <th className="py-3 px-4 text-start">{t('finance.accountCode')}</th>
+                <th className="py-3 px-4 text-start">{t('menu.ingredient')}</th>
+                <th className="py-3 px-3 text-start">{t('inventory.title')}</th>
+                <th className="py-3 px-3 text-end">{t('menu.portionCost')}</th>
+                <th className="py-3 px-3 text-end">{t('inventory.theoreticalStock')}</th>
+                <th className="py-3 px-3 text-end">{t('inventory.bookStock')}</th>
+                <th className="py-3 px-3 text-end">{t('inventory.physicalStock')}</th>
+                <th className="py-3 px-3 text-end">{t('inventory.variance')}</th>
+                <th className="py-3 px-3 text-end">{t('inventory.valuation')}</th>
+                <th className="py-3 px-4 text-center">{t('common.status')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
@@ -179,45 +181,46 @@ export const InventoryModule: React.FC = () => {
                   key={item.id}
                   className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors"
                 >
-                  <td className="py-3 px-4 font-mono font-bold text-cyan-600 dark:text-cyan-400">
+                  <td className="py-3 px-4 font-mono font-bold text-cyan-600 dark:text-cyan-400 text-start" dir="ltr">
                     {item.code}
                   </td>
-                  <td className="py-3 px-4 font-medium text-slate-900 dark:text-slate-100">
+                  <td className="py-3 px-4 font-medium text-slate-900 dark:text-slate-100 text-start">
                     {item.name}
                   </td>
-                  <td className="py-3 px-3 text-slate-500">
+                  <td className="py-3 px-3 text-slate-500 text-start">
                     {item.warehouseName.split(' ')[0]}
                   </td>
-                  <td className="py-3 px-3 text-right font-mono text-slate-700 dark:text-slate-300">
-                    ${item.costPerUnit.toFixed(2)} / {item.unit}
+                  <td className="py-3 px-3 text-end font-mono text-slate-700 dark:text-slate-300" dir="ltr">
+                    {formatCurrency(item.costPerUnit)} / {item.unit}
                   </td>
-                  <td className="py-3 px-3 text-right font-mono text-slate-700 dark:text-slate-300">
+                  <td className="py-3 px-3 text-end font-mono text-slate-700 dark:text-slate-300" dir="ltr">
                     {item.theoreticalStock} {item.unit}
                   </td>
-                  <td className="py-3 px-3 text-right font-mono text-slate-700 dark:text-slate-300">
+                  <td className="py-3 px-3 text-end font-mono text-slate-700 dark:text-slate-300" dir="ltr">
                     {item.bookStock} {item.unit}
                   </td>
-                  <td className="py-3 px-3 text-right font-mono font-bold text-slate-900 dark:text-white">
+                  <td className="py-3 px-3 text-end font-mono font-bold text-slate-900 dark:text-white" dir="ltr">
                     {item.physicalStock} {item.unit}
                   </td>
                   <td
-                    className={`py-3 px-3 text-right font-mono font-bold ${
+                    className={`py-3 px-3 text-end font-mono font-bold ${
                       item.variance < 0 ? 'text-rose-500' : 'text-emerald-500'
                     }`}
+                    dir="ltr"
                   >
                     {item.variance === 0 ? '0.00' : `${item.variance} ${item.unit}`}
                   </td>
-                  <td className="py-3 px-3 text-right font-mono font-bold text-slate-900 dark:text-slate-100">
-                    ${item.totalValuation.toFixed(2)}
+                  <td className="py-3 px-3 text-end font-mono font-bold text-slate-900 dark:text-slate-100" dir="ltr">
+                    {formatCurrency(item.totalValuation)}
                   </td>
                   <td className="py-3 px-4 text-center">
                     <span
                       className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
                         item.status === 'in_stock'
-                          ? 'bg-emerald-500/10 text-emerald-500'
+                          ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
                           : item.status === 'low_stock'
-                          ? 'bg-amber-500/10 text-amber-500'
-                          : 'bg-rose-500/10 text-rose-500 border border-rose-500/30'
+                          ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                          : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/30'
                       }`}
                     >
                       {item.status.replace('_', ' ')}
@@ -230,9 +233,9 @@ export const InventoryModule: React.FC = () => {
         </div>
 
         <div className="p-3 bg-slate-50 dark:bg-slate-950/40 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500">
-          <span>Theoretical (POS Recipe Consumption) · Book (Recorded Ledger) · Physical (Audit Count)</span>
-          <span className="font-mono font-bold text-slate-800 dark:text-slate-200">
-            Total Sample Valuation: ${totalInventoryValuation.toFixed(2)}
+          <span>{t('inventory.subtitle')}</span>
+          <span className="font-mono font-bold text-slate-800 dark:text-slate-200" dir="ltr">
+            {t('inventory.valuation')}: {formatCurrency(totalInventoryValuation)}
           </span>
         </div>
       </div>
@@ -244,16 +247,16 @@ export const InventoryModule: React.FC = () => {
             <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
               <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 <ArrowRightLeft className="w-4 h-4 text-cyan-400" />
-                <span>Inter-Warehouse Stock Transfer</span>
+                <span>{t('inventory.transfer')}</span>
               </h3>
-              <button onClick={() => setTransferModal(false)} className="text-slate-400 hover:text-white">
+              <button onClick={() => setTransferModal(false)} className="text-slate-400 hover:text-white cursor-pointer">
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             <div className="space-y-3 my-4 text-xs">
               <div>
-                <label className="block text-slate-500 mb-1">Source Warehouse (Outflow)</label>
+                <label className="block text-slate-500 mb-1">{t('inventory.sourceWh')}</label>
                 <select
                   value={transferSource}
                   onChange={(e) => setTransferSource(e.target.value)}
@@ -265,7 +268,7 @@ export const InventoryModule: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-slate-500 mb-1">Destination Warehouse (Inflow)</label>
+                <label className="block text-slate-500 mb-1">{t('inventory.destWh')}</label>
                 <select
                   value={transferDest}
                   onChange={(e) => setTransferDest(e.target.value)}
@@ -278,7 +281,7 @@ export const InventoryModule: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-slate-500 mb-1">Raw Material</label>
+                <label className="block text-slate-500 mb-1">{t('menu.ingredient')}</label>
                 <input
                   type="text"
                   value={transferItem}
@@ -288,12 +291,13 @@ export const InventoryModule: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-slate-500 mb-1">Transfer Quantity (Units)</label>
+                <label className="block text-slate-500 mb-1">{t('common.quantity')}</label>
                 <input
                   type="number"
                   value={transferQty}
                   onChange={(e) => setTransferQty(e.target.value)}
                   className="w-full p-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-900 dark:text-slate-100 font-mono"
+                  dir="ltr"
                 />
               </div>
             </div>
@@ -301,15 +305,15 @@ export const InventoryModule: React.FC = () => {
             <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-2">
               <button
                 onClick={() => setTransferModal(false)}
-                className="px-3.5 py-2 text-xs font-medium text-slate-500 hover:text-white"
+                className="px-3.5 py-2 text-xs font-medium text-slate-500 hover:text-white cursor-pointer"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 onClick={handleExecuteTransfer}
                 className="px-4 py-2 text-xs font-bold text-white bg-cyan-600 hover:bg-cyan-500 rounded-lg cursor-pointer"
               >
-                Dispatch Transfer
+                {t('inventory.dispatchTransfer')}
               </button>
             </div>
           </div>

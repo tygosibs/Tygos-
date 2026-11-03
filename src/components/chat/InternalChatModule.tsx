@@ -18,9 +18,11 @@ import {
 import { MOCK_CHAT_CHANNELS, MOCK_CHAT_MESSAGES } from '../../data/mockData.ts';
 import { ChatChannel, ChatMessage } from '../../types/index.ts';
 import { useAuth } from '../../context/AuthContext.tsx';
+import { useI18n } from '../../i18n/I18nContext.tsx';
 
 export const InternalChatModule: React.FC = () => {
   const { currentUser } = useAuth();
+  const { t, dir } = useI18n();
   const [channels, setChannels] = useState<ChatChannel[]>(MOCK_CHAT_CHANNELS);
   const [selectedChannelId, setSelectedChannelId] = useState<string>('ch-kitchen');
   const [messages, setMessages] = useState<Record<string, ChatMessage[]>>(MOCK_CHAT_MESSAGES);
@@ -77,23 +79,25 @@ export const InternalChatModule: React.FC = () => {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-          Internal Hospitality Communications
+          {t('chat.title', 'Internal Hospitality Communications')}
         </h1>
         <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-          Departmental dispatch channels, hot-line order calls, shift handovers, and executive announcements.
+          {t('chat.subtitle', 'Departmental dispatch channels, hot-line order calls, shift handovers, and executive announcements.')}
         </p>
       </div>
 
       {/* Main Chat Interface */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs overflow-hidden grid grid-cols-1 md:grid-cols-12 h-[600px]">
-        {/* Left Sidebar: Channels List */}
-        <div className="md:col-span-4 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+        {/* Sidebar: Channels List */}
+        <div className="md:col-span-4 border-e border-slate-200 dark:border-slate-800 flex flex-col justify-between">
           <div>
             <div className="p-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                Staff Channels
+                {t('chat.staffChannels', 'Staff Channels')}
               </span>
-              <span className="text-[10px] text-cyan-500 font-mono">Real-time</span>
+              <span className="text-[10px] text-cyan-500 font-mono">
+                {t('chat.realtime', 'Real-time')}
+              </span>
             </div>
 
             <div className="p-2 space-y-1">
@@ -115,12 +119,12 @@ export const InternalChatModule: React.FC = () => {
                         <span className="text-xs font-bold">{ch.name}</span>
                       </div>
                       {ch.unreadCount > 0 && (
-                        <span className="w-5 h-5 rounded-full bg-cyan-500 text-slate-950 text-[10px] font-bold flex items-center justify-center">
+                        <span className="w-5 h-5 rounded-full bg-cyan-500 text-slate-950 text-[10px] font-bold flex items-center justify-center font-mono" dir="ltr">
                           {ch.unreadCount}
                         </span>
                       )}
                     </div>
-                    <p className="text-[11px] text-slate-400 mt-1 truncate pl-6">
+                    <p className="text-[11px] text-slate-400 mt-1 truncate ps-6">
                       {ch.lastMessageSnippet}
                     </p>
                   </div>
@@ -130,12 +134,14 @@ export const InternalChatModule: React.FC = () => {
           </div>
 
           <div className="p-3 bg-slate-50 dark:bg-slate-950/60 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 flex items-center justify-between">
-            <span>Signed in as: <strong>{currentUser?.fullName}</strong></span>
-            <span className="text-emerald-400 font-mono">Online</span>
+            <span>
+              {t('chat.signedInAs', 'Signed in as:')} <strong>{currentUser?.fullName}</strong>
+            </span>
+            <span className="text-emerald-400 font-mono">{t('chat.online', 'Online')}</span>
           </div>
         </div>
 
-        {/* Right Main Chat View */}
+        {/* Main Chat View */}
         <div className="md:col-span-8 flex flex-col justify-between h-full bg-slate-50/50 dark:bg-slate-950/30">
           {/* Channel Header */}
           <div className="p-3.5 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between">
@@ -150,7 +156,7 @@ export const InternalChatModule: React.FC = () => {
             </div>
             <div className="flex items-center gap-1.5 text-xs text-slate-400">
               <Users className="w-3.5 h-3.5" />
-              <span>All Kitchen & Service Staff</span>
+              <span>{t('chat.allStaffNotice', 'All Kitchen & Service Staff')}</span>
             </div>
           </div>
 
@@ -159,8 +165,10 @@ export const InternalChatModule: React.FC = () => {
             {currentMessages.length === 0 ? (
               <div className="py-20 text-center text-xs text-slate-400">
                 <MessageSquare className="w-8 h-8 text-slate-600 mx-auto mb-2 opacity-50" />
-                <p>No messages yet in {activeChannel.name}.</p>
-                <p className="text-[11px] text-slate-500">Send a briefing or table status update below.</p>
+                <p>{t('chat.noMessages', 'No messages yet in this channel.')}</p>
+                <p className="text-[11px] text-slate-500">
+                  {t('chat.noMessagesDesc', 'Send a briefing or table status update below.')}
+                </p>
               </div>
             ) : (
               currentMessages.map((msg) => (
@@ -177,7 +185,9 @@ export const InternalChatModule: React.FC = () => {
                     <span className="text-[10px] text-cyan-500 uppercase font-mono">
                       {msg.senderRole}
                     </span>
-                    <span className="text-[10px] text-slate-400">{msg.timestamp}</span>
+                    <span className="text-[10px] text-slate-400 font-mono" dir="ltr">
+                      {msg.timestamp}
+                    </span>
                   </div>
 
                   <div
@@ -195,7 +205,8 @@ export const InternalChatModule: React.FC = () => {
                         {msg.reactions.map((r, i) => (
                           <span
                             key={i}
-                            className="text-[10px] px-1.5 py-0.5 rounded-full bg-black/20 text-white flex items-center gap-1"
+                            className="text-[10px] px-1.5 py-0.5 rounded-full bg-black/20 text-white flex items-center gap-1 font-mono"
+                            dir="ltr"
                           >
                             <span>{r.emoji}</span>
                             <span>{r.count}</span>
@@ -205,22 +216,22 @@ export const InternalChatModule: React.FC = () => {
                     )}
 
                     {/* Quick Reaction Bar on Hover */}
-                    <div className="absolute top-1 right-2 hidden group-hover:flex items-center gap-1 bg-slate-900/90 text-white px-2 py-0.5 rounded-full text-xs shadow-md">
+                    <div className="absolute top-1 end-2 hidden group-hover:flex items-center gap-1 bg-slate-900/90 text-white px-2 py-0.5 rounded-full text-xs shadow-md">
                       <button
                         onClick={() => handleAddReaction(msg.id, '👍')}
-                        className="hover:scale-125 transition-transform"
+                        className="hover:scale-125 transition-transform cursor-pointer"
                       >
                         👍
                       </button>
                       <button
                         onClick={() => handleAddReaction(msg.id, '🔥')}
-                        className="hover:scale-125 transition-transform"
+                        className="hover:scale-125 transition-transform cursor-pointer"
                       >
                         🔥
                       </button>
                       <button
                         onClick={() => handleAddReaction(msg.id, '✅')}
-                        className="hover:scale-125 transition-transform"
+                        className="hover:scale-125 transition-transform cursor-pointer"
                       >
                         ✅
                       </button>
@@ -238,7 +249,7 @@ export const InternalChatModule: React.FC = () => {
           >
             <input
               type="text"
-              placeholder={`Message ${activeChannel.name}...`}
+              placeholder={`${t('chat.sendPlaceholder', 'Type a message...')} (${activeChannel.name})`}
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               className="flex-1 px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-cyan-500"
@@ -252,7 +263,7 @@ export const InternalChatModule: React.FC = () => {
                   : 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
               }`}
             >
-              <Send className="w-4 h-4" />
+              <Send className={`w-4 h-4 ${dir === 'rtl' ? 'rotate-180' : ''}`} />
             </button>
           </form>
         </div>

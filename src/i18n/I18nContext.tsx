@@ -4,338 +4,62 @@
  */
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { TRANSLATIONS } from './translations.ts';
+import { formatCurrency, formatNumber, formatPercent } from './formatters.ts';
 
-export type LanguageCode = 'en' | 'ar' | 'fr' | 'nl' | 'tr';
+export type LanguageCode = 'ar' | 'en' | 'fr' | 'nl' | 'tr';
 
-interface I18nContextType {
+export interface I18nContextType {
   language: LanguageCode;
   setLanguage: (lang: LanguageCode) => void;
   dir: 'ltr' | 'rtl';
+  isRtl: boolean;
   t: (key: string, fallback?: string) => string;
+  formatCurrency: (amount: number, currency?: string) => string;
+  formatNumber: (value: number, decimals?: number) => string;
+  formatPercent: (value: number) => string;
 }
 
-const translations: Record<LanguageCode, Record<string, string>> = {
-  en: {
-    'brand.name': 'Tygos',
-    'brand.tagline': 'Hospitality ERP & Intelligence Platform',
-    'common.search': 'Search everything (Products, Orders, Accounts, CRM)...',
-    'common.filter': 'Filter',
-    'common.status': 'Status',
-    'common.actions': 'Actions',
-    'common.save': 'Save Changes',
-    'common.cancel': 'Cancel',
-    'common.delete': 'Delete',
-    'common.confirm': 'Confirm',
-    'common.edit': 'Edit',
-    'common.view': 'View Details',
-    'common.online': 'Online',
-    'common.offline': 'Offline Mode',
-    'common.syncing': 'Synchronizing',
-    'common.synced': 'Synced',
-    'common.pending_changes': 'Pending Changes',
-    'common.switch_role': 'Simulate Role',
-    'common.phase1_badge': 'Phase 1 Architecture · UI & Mock Foundation',
-    'nav.dashboard': 'Dashboard',
-    'nav.pos': 'Point of Sale (POS)',
-    'nav.tables': 'Table Floor Plan',
-    'nav.menu': 'Menu & Recipes',
-    'nav.cost_control': 'Cost Control & Variance',
-    'nav.inventory': 'Inventory & Warehouses',
-    'nav.purchasing': 'Purchasing & Suppliers',
-    'nav.finance': 'Finance & Accounting',
-    'nav.tax': 'Tax & Electronic Documents',
-    'nav.hr': 'HR & Payroll',
-    'nav.crm': 'CRM & Loyalty',
-    'nav.chat': 'Internal Communications',
-    'nav.super_admin': 'Super Admin Center',
-    'nav.settings': 'Establishment Settings',
-    'auth.login': 'Log In',
-    'auth.logout': 'Sign Out',
-    'auth.register': 'Register Establishment',
-    'auth.est_code': 'Establishment Code',
-    'auth.username': 'Username / Email / Phone',
-    'auth.password': 'Password',
-    'auth.remember': 'Remember establishment',
-    'auth.quick_roles': 'Quick Test Credentials',
-    'pos.dine_in': 'Dine In',
-    'pos.take_away': 'Take Away',
-    'pos.delivery': 'Delivery',
-    'pos.open_tables': 'Open Tables',
-    'pos.pay': 'Pay Order',
-    'pos.subtotal': 'Subtotal',
-    'pos.tax': 'Tax',
-    'pos.total': 'Total Due',
-    'cost.food_cost': 'Food Cost %',
-    'cost.bev_cost': 'Beverage Cost %',
-    'cost.labor_cost': 'Labor Cost %',
-    'cost.prime_cost': 'Prime Cost %',
-    'inv.theoretical': 'Theoretical Stock',
-    'inv.book': 'Book Stock',
-    'inv.physical': 'Physical Stock',
-    'inv.variance': 'Variance',
-    'super.total_est': 'Total Establishments',
-    'super.active_est': 'Active Establishments',
-    'super.support_session': 'Temporary Support Session',
-  },
-  ar: {
-    'brand.name': 'تايجوس',
-    'brand.tagline': 'منظومة إدارة الضيافة الشاملة والذكاء التشغيلي',
-    'common.search': 'البحث الشامل (منتجات، فواتير، حسابات، عملاء)...',
-    'common.filter': 'تصفية',
-    'common.status': 'الحالة',
-    'common.actions': 'الإجراءات',
-    'common.save': 'حفظ التعديلات',
-    'common.cancel': 'إلغاء',
-    'common.delete': 'حذف',
-    'common.confirm': 'تأكيد',
-    'common.edit': 'تعديل',
-    'common.view': 'عرض التفاصيل',
-    'common.online': 'متصل بالشبكة',
-    'common.offline': 'وضع العمل دون اتصال',
-    'common.syncing': 'جاري المزامنة',
-    'common.synced': 'تمت المزامنة',
-    'common.pending_changes': 'تغييرات معلقة',
-    'common.switch_role': 'محاكاة الدور الوظيفي',
-    'common.phase1_badge': 'المرحلة 1 · البنية الهيكلية وواجهات العرض',
-    'nav.dashboard': 'لوحة القيادة الرئيسية',
-    'nav.pos': 'نقطة البيع (POS)',
-    'nav.tables': 'مخطط الطاولات والقاعات',
-    'nav.menu': 'قائمة الطعام والوصفات',
-    'nav.cost_control': 'مراقبة التكاليف والانحراف',
-    'nav.inventory': 'المستودعات والمخزون',
-    'nav.purchasing': 'المشتريات والموردين',
-    'nav.finance': 'المالية والحسابات العامة',
-    'nav.tax': 'الضرائب والفواتير الإلكترونية',
-    'nav.hr': 'الموارد البشرية والرواتب',
-    'nav.crm': 'علاقات العملاء والولاء',
-    'nav.chat': 'المحادثات الداخلية للفريق',
-    'nav.super_admin': 'مركز التحكم العام (Super Admin)',
-    'nav.settings': 'إعدادات المنشأة',
-    'auth.login': 'تسجيل الدخول',
-    'auth.logout': 'تسجيل الخروج',
-    'auth.register': 'تسجيل منشأة جديدة',
-    'auth.est_code': 'رمز المنشأة',
-    'auth.username': 'اسم المستخدم / البريد / الهاتف',
-    'auth.password': 'كلمة المرور',
-    'auth.remember': 'تذكر المنشأة',
-    'auth.quick_roles': 'تجربة سريعة للأدوار',
-    'pos.dine_in': 'صالة (محلي)',
-    'pos.take_away': 'سفري (تيك أواي)',
-    'pos.delivery': 'توصيل خارجي',
-    'pos.open_tables': 'طاولات مفتوحة',
-    'pos.pay': 'سداد الحساب',
-    'pos.subtotal': 'المجموع الفرعي',
-    'pos.tax': 'الضريبة',
-    'pos.total': 'الإجمالي المستحق',
-    'cost.food_cost': 'تكلفة الأغذية %',
-    'cost.bev_cost': 'تكلفة المشروبات %',
-    'cost.labor_cost': 'تكلفة العمالة %',
-    'cost.prime_cost': 'التكلفة الأولية (Prime Cost) %',
-    'inv.theoretical': 'المخزون النظري',
-    'inv.book': 'المخزون الدفتري',
-    'inv.physical': 'المخزون الفعلي',
-    'inv.variance': 'الانحراف',
-    'super.total_est': 'إجمالي المنشآت',
-    'super.active_est': 'المنشآت النشطة',
-    'super.support_session': 'جلسة دعم فني مؤقتة',
-  },
-  fr: {
-    'brand.name': 'Tygos',
-    'brand.tagline': 'Système ERP & Intelligence Hôtellerie',
-    'common.search': 'Recherche globale (Produits, Commandes, Comptes)...',
-    'common.filter': 'Filtrer',
-    'common.status': 'Statut',
-    'common.actions': 'Actions',
-    'common.save': 'Enregistrer',
-    'common.cancel': 'Annuler',
-    'common.delete': 'Supprimer',
-    'common.confirm': 'Confirmer',
-    'common.edit': 'Modifier',
-    'common.view': 'Voir détails',
-    'common.online': 'En ligne',
-    'common.offline': 'Mode hors ligne',
-    'common.syncing': 'Synchronisation',
-    'common.synced': 'Synchronisé',
-    'common.pending_changes': 'Modifications en attente',
-    'common.switch_role': 'Changer de rôle',
-    'common.phase1_badge': 'Phase 1 · Architecture & Interface Maquette',
-    'nav.dashboard': 'Tableau de bord',
-    'nav.pos': 'Point de Vente (POS)',
-    'nav.tables': 'Plan des Tables',
-    'nav.menu': 'Menu & Fiches Recettes',
-    'nav.cost_control': 'Contrôle des Coûts & Écarts',
-    'nav.inventory': 'Stocks & Entrepôts',
-    'nav.purchasing': 'Achats & Fournisseurs',
-    'nav.finance': 'Finance & Comptabilité',
-    'nav.tax': 'Taxes & Factures Électroniques',
-    'nav.hr': 'Ressources Humaines & Paie',
-    'nav.crm': 'CRM & Fidélité',
-    'nav.chat': 'Messagerie Interne',
-    'nav.super_admin': 'Super Administration',
-    'nav.settings': 'Paramètres Établissement',
-    'auth.login': 'Connexion',
-    'auth.logout': 'Déconnexion',
-    'auth.register': 'Inscrire un Établissement',
-    'auth.est_code': 'Code Établissement',
-    'auth.username': 'Identifiant / Email / Téléphone',
-    'auth.password': 'Mot de passe',
-    'auth.remember': 'Se souvenir de l’établissement',
-    'auth.quick_roles': 'Comptes de Démonstration',
-    'pos.dine_in': 'Sur place',
-    'pos.take_away': 'À emporter',
-    'pos.delivery': 'Livraison',
-    'pos.open_tables': 'Tables Ouvertes',
-    'pos.pay': 'Encaisser',
-    'pos.subtotal': 'Sous-total',
-    'pos.tax': 'TVA',
-    'pos.total': 'Total à Payer',
-    'cost.food_cost': 'Coût Matières %',
-    'cost.bev_cost': 'Coût Boissons %',
-    'cost.labor_cost': 'Coût Main-d’œuvre %',
-    'cost.prime_cost': 'Prime Cost %',
-    'inv.theoretical': 'Stock Théorique',
-    'inv.book': 'Stock Comptable',
-    'inv.physical': 'Stock Physique',
-    'inv.variance': 'Écart',
-    'super.total_est': 'Total Établissements',
-    'super.active_est': 'Établissements Actifs',
-    'super.support_session': 'Session Support Temporaire',
-  },
-  nl: {
-    'brand.name': 'Tygos',
-    'brand.tagline': 'Horeca ERP & Intelligence Platform',
-    'common.search': 'Zoek in alles (Producten, Bestellingen, Financiën)...',
-    'common.filter': 'Filteren',
-    'common.status': 'Status',
-    'common.actions': 'Acties',
-    'common.save': 'Opslaan',
-    'common.cancel': 'Annuleren',
-    'common.delete': 'Verwijderen',
-    'common.confirm': 'Bevestigen',
-    'common.edit': 'Bewerken',
-    'common.view': 'Details bekijken',
-    'common.online': 'Online',
-    'common.offline': 'Offline modus',
-    'common.syncing': 'Synchroniseren',
-    'common.synced': 'Gesynchroniseerd',
-    'common.pending_changes': 'Wijzigingen in wachtrij',
-    'common.switch_role': 'Rol simuleren',
-    'common.phase1_badge': 'Fase 1 · Architectuur & UI Mockup',
-    'nav.dashboard': 'Dashboard',
-    'nav.pos': 'Kassasysteem (POS)',
-    'nav.tables': 'Tafelplattegrond',
-    'nav.menu': 'Menu & Recepturen',
-    'nav.cost_control': 'Kostenbeheersing & Variantie',
-    'nav.inventory': 'Voorraad & Magazijnen',
-    'nav.purchasing': 'Inkoop & Leveranciers',
-    'nav.finance': 'Financiën & Boekhouding',
-    'nav.tax': 'Btw & E-Facturatie',
-    'nav.hr': 'Personeel & Salarissen',
-    'nav.crm': 'CRM & Klantloyaliteit',
-    'nav.chat': 'Interne Communicatie',
-    'nav.super_admin': 'Super Admin Beheer',
-    'nav.settings': 'Instellingen',
-    'auth.login': 'Inloggen',
-    'auth.logout': 'Uitloggen',
-    'auth.register': 'Vestiging Registreren',
-    'auth.est_code': 'Vestigingscode',
-    'auth.username': 'Gebruikersnaam / E-mail / Telefoon',
-    'auth.password': 'Wachtwoord',
-    'auth.remember': 'Onthoud vestiging',
-    'auth.quick_roles': 'Demo Testaccounts',
-    'pos.dine_in': 'Ter plaatse',
-    'pos.take_away': 'Afhalen',
-    'pos.delivery': 'Bezorging',
-    'pos.open_tables': 'Open Tafels',
-    'pos.pay': 'Afrekenen',
-    'pos.subtotal': 'Subtotaal',
-    'pos.tax': 'Btw',
-    'pos.total': 'Totaal Te Betalen',
-    'cost.food_cost': 'Food Cost %',
-    'cost.bev_cost': 'Beverage Cost %',
-    'cost.labor_cost': 'Arbeidskosten %',
-    'cost.prime_cost': 'Prime Cost %',
-    'inv.theoretical': 'Theoretische Voorraad',
-    'inv.book': 'Boekhoudkundige Voorraad',
-    'inv.physical': 'Fysieke Voorraad',
-    'inv.variance': 'Variantie',
-    'super.total_est': 'Totaal Aantal Vestigingen',
-    'super.active_est': 'Actieve Vestigingen',
-    'super.support_session': 'Tijdelijke Support Sessie',
-  },
-  tr: {
-    'brand.name': 'Tygos',
-    'brand.tagline': 'Konaklama & Restoran ERP ve Yönetim Zekası',
-    'common.search': 'Her şeyi ara (Ürünler, Siparişler, Muhasebe, CRM)...',
-    'common.filter': 'Filtrele',
-    'common.status': 'Durum',
-    'common.actions': 'İşlemler',
-    'common.save': 'Kaydet',
-    'common.cancel': 'İptal',
-    'common.delete': 'Sil',
-    'common.confirm': 'Onayla',
-    'common.edit': 'Düzenle',
-    'common.view': 'Detayları Gör',
-    'common.online': 'Çevrimiçi',
-    'common.offline': 'Çevrimdışı Modu',
-    'common.syncing': 'Senkronize Ediliyor',
-    'common.synced': 'Senkronize Edildi',
-    'common.pending_changes': 'Bekleyen Değişiklikler',
-    'common.switch_role': 'Rol Değiştir',
-    'common.phase1_badge': 'Faz 1 · Mimari ve Arayüz Temeli',
-    'nav.dashboard': 'Kontrol Paneli',
-    'nav.pos': 'Satış Noktası (POS)',
-    'nav.tables': 'Masa Yerleşimi',
-    'nav.menu': 'Menü ve Reçeteler',
-    'nav.cost_control': 'Maliyet Kontrolü ve Sapma',
-    'nav.inventory': 'Stok ve Depolar',
-    'nav.purchasing': 'Satınalma ve Tedarikçiler',
-    'nav.finance': 'Finans ve Muhasebe',
-    'nav.tax': 'Vergi ve E-Belgeler',
-    'nav.hr': 'İK ve Bordro',
-    'nav.crm': 'CRM ve Sadakat',
-    'nav.chat': 'Dahili İletişim',
-    'nav.super_admin': 'Süper Yönetici Paneli',
-    'nav.settings': 'İşletme Ayarları',
-    'auth.login': 'Giriş Yap',
-    'auth.logout': 'Çıkış Yap',
-    'auth.register': 'İşletme Kaydı',
-    'auth.est_code': 'İşletme Kodu',
-    'auth.username': 'Kullanıcı Adı / E-posta / Telefon',
-    'auth.password': 'Şifre',
-    'auth.remember': 'İşletmeyi hatırla',
-    'auth.quick_roles': 'Test Hesapları',
-    'pos.dine_in': 'Masada Servis',
-    'pos.take_away': 'Paket Servis (Gel-Al)',
-    'pos.delivery': 'Adrese Teslim',
-    'pos.open_tables': 'Açık Masalar',
-    'pos.pay': 'Ödeme Al',
-    'pos.subtotal': 'Ara Toplam',
-    'pos.tax': 'KDV',
-    'pos.total': 'Genel Toplam',
-    'cost.food_cost': 'Yiyecek Maliyeti %',
-    'cost.bev_cost': 'İçecek Maliyeti %',
-    'cost.labor_cost': 'İşçilik Maliyeti %',
-    'cost.prime_cost': 'Asli Maliyet (Prime) %',
-    'inv.theoretical': 'Teorik Stok',
-    'inv.book': 'Kayıtlı Stok',
-    'inv.physical': 'Fiziki Stok',
-    'inv.variance': 'Fark / Sapma',
-    'super.total_est': 'Toplam İşletmeler',
-    'super.active_est': 'Aktif İşletmeler',
-    'super.support_session': 'Geçici Destek Oturumu',
-  },
-};
+const SUPPORTED_LANGUAGES: LanguageCode[] = ['ar', 'en', 'fr', 'nl', 'tr'];
+
+/**
+ * Priority order for language resolution:
+ * 1. Previously saved user language preference in localStorage
+ * 2. Supported device/browser language (e.g. navigator.language)
+ * 3. Arabic fallback (Official primary language of Tygos)
+ */
+function resolveInitialLanguage(): LanguageCode {
+  // 1. Saved preference
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('tygos_lang') as LanguageCode | null;
+    if (saved && SUPPORTED_LANGUAGES.includes(saved)) {
+      return saved;
+    }
+
+    // 2. Browser / Device language
+    try {
+      const browserLang = (navigator.language || (navigator as any).userLanguage || '').toLowerCase();
+      if (browserLang.startsWith('ar')) return 'ar';
+      if (browserLang.startsWith('en')) return 'en';
+      if (browserLang.startsWith('fr')) return 'fr';
+      if (browserLang.startsWith('nl')) return 'nl';
+      if (browserLang.startsWith('tr')) return 'tr';
+    } catch {
+      // Ignore detection errors in headless / sandbox environments
+    }
+  }
+
+  // 3. Official primary default: Arabic
+  return 'ar';
+}
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
 export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguageState] = useState<LanguageCode>(() => {
-    const saved = localStorage.getItem('tygos_lang') as LanguageCode;
-    return ['en', 'ar', 'fr', 'nl', 'tr'].includes(saved) ? saved : 'en';
-  });
+  const [language, setLanguageState] = useState<LanguageCode>(resolveInitialLanguage);
 
-  const dir = language === 'ar' ? 'rtl' : 'ltr';
+  const dir: 'ltr' | 'rtl' = language === 'ar' ? 'rtl' : 'ltr';
+  const isRtl = dir === 'rtl';
 
   useEffect(() => {
     document.documentElement.setAttribute('dir', dir);
@@ -348,11 +72,34 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const t = (key: string, fallback?: string): string => {
-    return translations[language]?.[key] || translations.en?.[key] || fallback || key;
+    return TRANSLATIONS[language]?.[key] || TRANSLATIONS.en?.[key] || fallback || key;
+  };
+
+  const boundFormatCurrency = (amount: number, currency: string = 'USD'): string => {
+    return formatCurrency(amount, currency, language);
+  };
+
+  const boundFormatNumber = (value: number, decimals: number = 0): string => {
+    return formatNumber(value, language, decimals);
+  };
+
+  const boundFormatPercent = (value: number): string => {
+    return formatPercent(value, language);
   };
 
   return (
-    <I18nContext.Provider value={{ language, setLanguage, dir, t }}>
+    <I18nContext.Provider
+      value={{
+        language,
+        setLanguage,
+        dir,
+        isRtl,
+        t,
+        formatCurrency: boundFormatCurrency,
+        formatNumber: boundFormatNumber,
+        formatPercent: boundFormatPercent,
+      }}
+    >
       {children}
     </I18nContext.Provider>
   );

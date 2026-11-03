@@ -25,9 +25,11 @@ import {
 import { MOCK_ESTABLISHMENTS, MOCK_MAINTENANCE_SESSIONS } from '../../data/mockData.ts';
 import { Establishment, EstablishmentStatus } from '../../types/index.ts';
 import { useAuth } from '../../context/AuthContext.tsx';
+import { useI18n } from '../../i18n/I18nContext.tsx';
 
 export const SuperAdminDashboard: React.FC = () => {
   const { startSupportSession, setActiveView } = useAuth();
+  const { t, isRtl, formatNumber } = useI18n();
 
   const [establishments, setEstablishments] = useState<Establishment[]>(MOCK_ESTABLISHMENTS);
   const [searchQuery, setSearchQuery] = useState('');
@@ -86,24 +88,24 @@ export const SuperAdminDashboard: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-              Super Admin Control Center
+              {t('admin.controlCenter')}
             </h1>
-            <span className="text-xs px-2 py-0.5 rounded-full font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20">
-              Tygos Ecosystem Master
+            <span className="text-xs px-2 py-0.5 rounded-full font-semibold bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">
+              {t('admin.ecosystemMaster')}
             </span>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Global management of multi-tenant hospitality partitions, security isolation, and system health.
+            {t('admin.subtitle')}
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           <button
             onClick={() => setActiveView('dashboard')}
-            className="px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-300 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors flex items-center gap-2"
+            className="px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-300 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors flex items-center gap-2 cursor-pointer"
           >
-            <ExternalLink className="w-3.5 h-3.5" />
-            <span>Open Sample Tenant</span>
+            <ExternalLink className="w-3.5 h-3.5 rtl:rotate-180" />
+            <span>{t('navigation.dashboard')}</span>
           </button>
         </div>
       </div>
@@ -112,68 +114,68 @@ export const SuperAdminDashboard: React.FC = () => {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500">Establishments</span>
-            <Building2 className="w-4 h-4 text-cyan-400" />
+            <span className="text-xs font-medium text-slate-500">{t('admin.totalEst')}</span>
+            <Building2 className="w-4 h-4 text-cyan-500" />
           </div>
           <div className="text-2xl font-black mt-2 text-slate-900 dark:text-white font-mono">
             42
           </div>
-          <span className="text-[11px] text-emerald-500 font-medium">+3 this month</span>
+          <span className="text-[11px] text-emerald-500 font-medium">+3 {t('common.active')}</span>
         </div>
 
         <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500">Active</span>
-            <CheckCircle className="w-4 h-4 text-emerald-400" />
+            <span className="text-xs font-medium text-slate-500">{t('admin.activeEst')}</span>
+            <CheckCircle className="w-4 h-4 text-emerald-500" />
           </div>
           <div className="text-2xl font-black mt-2 text-emerald-600 dark:text-emerald-400 font-mono">
             38
           </div>
-          <span className="text-[11px] text-slate-400">90.5% healthy</span>
+          <span className="text-[11px] text-slate-400">90.5%</span>
         </div>
 
         <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500">Trial / Suspended</span>
-            <ShieldAlert className="w-4 h-4 text-amber-400" />
+            <span className="text-xs font-medium text-slate-500">{t('admin.trialSuspended')}</span>
+            <ShieldAlert className="w-4 h-4 text-amber-500" />
           </div>
           <div className="text-2xl font-black mt-2 text-amber-500 font-mono">
             4
           </div>
-          <span className="text-[11px] text-slate-400">2 trial · 2 suspended</span>
+          <span className="text-[11px] text-slate-400">2 / 2</span>
         </div>
 
         <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500">Total Branches</span>
-            <Building2 className="w-4 h-4 text-blue-400" />
+            <span className="text-xs font-medium text-slate-500">{t('admin.totalBranches')}</span>
+            <Building2 className="w-4 h-4 text-blue-500" />
           </div>
           <div className="text-2xl font-black mt-2 text-slate-900 dark:text-white font-mono">
             98
           </div>
-          <span className="text-[11px] text-slate-400">Across 6 countries</span>
+          <span className="text-[11px] text-slate-400">6 {t('admin.tableCountry')}</span>
         </div>
 
         <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500">Active Sessions</span>
-            <Users className="w-4 h-4 text-purple-400" />
+            <span className="text-xs font-medium text-slate-500">{t('admin.activeSessions')}</span>
+            <Users className="w-4 h-4 text-purple-500" />
           </div>
-          <div className="text-2xl font-black mt-2 text-purple-500 dark:text-purple-400 font-mono">
+          <div className="text-2xl font-black mt-2 text-purple-600 dark:text-purple-400 font-mono">
             312
           </div>
-          <span className="text-[11px] text-slate-400">Staff & POS online</span>
+          <span className="text-[11px] text-slate-400">{t('common.active')}</span>
         </div>
 
         <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500">System Health</span>
-            <Activity className="w-4 h-4 text-emerald-400" />
+            <span className="text-xs font-medium text-slate-500">{t('admin.systemHealth')}</span>
+            <Activity className="w-4 h-4 text-emerald-500" />
           </div>
           <div className="text-2xl font-black mt-2 text-emerald-500 font-mono">
             99.98%
           </div>
-          <span className="text-[11px] text-emerald-400 font-medium">Optimal</span>
+          <span className="text-[11px] text-emerald-500 font-medium">{t('sync.synced')}</span>
         </div>
       </div>
 
@@ -183,13 +185,13 @@ export const SuperAdminDashboard: React.FC = () => {
         <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2 flex-1 max-w-md">
             <div className="relative w-full">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+              <Search className="w-4 h-4 text-slate-400 absolute start-3 top-2.5" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search code, name, owner, country..."
-                className="w-full pl-9 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-cyan-500"
+                placeholder={t('admin.searchPlaceholder')}
+                className="w-full ps-9 pe-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-cyan-500"
               />
             </div>
           </div>
@@ -201,8 +203,8 @@ export const SuperAdminDashboard: React.FC = () => {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="px-2.5 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-700 dark:text-slate-300 focus:outline-none"
             >
-              <option value="all">All Statuses</option>
-              <option value="active">Active</option>
+              <option value="all">{t('common.all')}</option>
+              <option value="active">{t('common.active')}</option>
               <option value="trial">Trial</option>
               <option value="suspended">Suspended</option>
               <option value="blocked">Blocked</option>
@@ -212,19 +214,19 @@ export const SuperAdminDashboard: React.FC = () => {
 
         {/* High Density Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+          <table className="w-full text-start text-xs">
             <thead className="bg-slate-50 dark:bg-slate-950/60 text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 font-semibold">
               <tr>
-                <th className="py-3 px-4">Code</th>
-                <th className="py-3 px-4">Business Name</th>
-                <th className="py-3 px-4">Owner</th>
-                <th className="py-3 px-4">Type</th>
-                <th className="py-3 px-4">Country</th>
-                <th className="py-3 px-3 text-right">Branches</th>
-                <th className="py-3 px-3 text-right">Users</th>
-                <th className="py-3 px-4">Status</th>
-                <th className="py-3 px-4">Last Activity</th>
-                <th className="py-3 px-4 text-right">Actions</th>
+                <th className="py-3 px-4 text-start">{t('admin.tableCode')}</th>
+                <th className="py-3 px-4 text-start">{t('admin.tableName')}</th>
+                <th className="py-3 px-4 text-start">{t('admin.tableOwner')}</th>
+                <th className="py-3 px-4 text-start">{t('admin.tableType')}</th>
+                <th className="py-3 px-4 text-start">{t('admin.tableCountry')}</th>
+                <th className="py-3 px-3 text-end">{t('admin.tableBranches')}</th>
+                <th className="py-3 px-3 text-end">{t('admin.tableUsers')}</th>
+                <th className="py-3 px-4 text-start">{t('admin.tableStatus')}</th>
+                <th className="py-3 px-4 text-start">{t('admin.tableLastActivity')}</th>
+                <th className="py-3 px-4 text-end">{t('common.actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
@@ -233,7 +235,7 @@ export const SuperAdminDashboard: React.FC = () => {
                   key={est.id}
                   className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors"
                 >
-                  <td className="py-3 px-4 font-mono font-bold text-cyan-600 dark:text-cyan-400">
+                  <td className="py-3 px-4 font-mono font-bold text-cyan-600 dark:text-cyan-400" dir="ltr">
                     {est.code}
                   </td>
                   <td className="py-3 px-4 font-medium text-slate-900 dark:text-slate-100">
@@ -243,15 +245,15 @@ export const SuperAdminDashboard: React.FC = () => {
                     {est.ownerName}
                   </td>
                   <td className="py-3 px-4 capitalize text-slate-500">
-                    {est.businessType.replace('_', ' ')}
+                    {t(`businessType.${est.businessType}`) || est.businessType.replace('_', ' ')}
                   </td>
                   <td className="py-3 px-4 text-slate-600 dark:text-slate-300">
                     {est.country}
                   </td>
-                  <td className="py-3 px-3 text-right font-mono text-slate-700 dark:text-slate-300">
+                  <td className="py-3 px-3 text-end font-mono text-slate-700 dark:text-slate-300">
                     {est.branchesCount}
                   </td>
-                  <td className="py-3 px-3 text-right font-mono text-slate-700 dark:text-slate-300">
+                  <td className="py-3 px-3 text-end font-mono text-slate-700 dark:text-slate-300">
                     {est.usersCount}
                   </td>
                   <td className="py-3 px-4">
@@ -269,16 +271,16 @@ export const SuperAdminDashboard: React.FC = () => {
                       {est.status}
                     </span>
                   </td>
-                  <td className="py-3 px-4 text-slate-500 text-[11px]">
+                  <td className="py-3 px-4 text-slate-500 text-[11px]" dir="ltr">
                     {est.lastActivity}
                   </td>
-                  <td className="py-3 px-4 text-right">
+                  <td className="py-3 px-4 text-end">
                     <div className="flex items-center justify-end gap-1">
                       {/* Temporary Support Session Action */}
                       <button
                         onClick={() => setSupportModalEst(est)}
-                        title="Enter Temporary Support Session (Audit Monitored)"
-                        className="p-1.5 rounded text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-950/40 transition-colors"
+                        title={t('admin.supportSession')}
+                        className="p-1.5 rounded text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-950/40 transition-colors cursor-pointer"
                       >
                         <Wrench className="w-3.5 h-3.5" />
                       </button>
@@ -286,8 +288,8 @@ export const SuperAdminDashboard: React.FC = () => {
                       {/* View Logs Action */}
                       <button
                         onClick={() => setLogsModalEst(est)}
-                        title="View System Audit Trail"
-                        className="p-1.5 rounded text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                        title={t('admin.logs')}
+                        className="p-1.5 rounded text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                       >
                         <FileSpreadsheet className="w-3.5 h-3.5" />
                       </button>
@@ -296,16 +298,16 @@ export const SuperAdminDashboard: React.FC = () => {
                       {est.status === 'active' ? (
                         <button
                           onClick={() => handleStatusChange(est.id, 'suspended')}
-                          title="Suspend Establishment"
-                          className="p-1.5 rounded text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition-colors"
+                          title="Suspend"
+                          className="p-1.5 rounded text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition-colors cursor-pointer"
                         >
                           <Ban className="w-3.5 h-3.5" />
                         </button>
                       ) : (
                         <button
                           onClick={() => handleStatusChange(est.id, 'active')}
-                          title="Activate Establishment"
-                          className="p-1.5 rounded text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-colors"
+                          title="Activate"
+                          className="p-1.5 rounded text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-colors cursor-pointer"
                         >
                           <CheckCircle className="w-3.5 h-3.5" />
                         </button>
@@ -317,8 +319,8 @@ export const SuperAdminDashboard: React.FC = () => {
                           setDeleteModalEst(est);
                           setDeleteConfirmationInput('');
                         }}
-                        title="Delete Establishment (Requires Code Confirmation)"
-                        className="p-1.5 rounded text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+                        title={t('common.delete')}
+                        className="p-1.5 rounded text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -331,8 +333,8 @@ export const SuperAdminDashboard: React.FC = () => {
         </div>
 
         <div className="p-3 bg-slate-50 dark:bg-slate-950/40 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500">
-          <span>Showing {filteredEsts.length} establishments across 6 countries</span>
-          <span>Tenant Data Isolation: Strict In-Memory Mock (Phase 1)</span>
+          <span>{filteredEsts.length} {t('admin.totalEst')}</span>
+          <span>{t('common.phase2Badge')}</span>
         </div>
       </div>
 
@@ -342,21 +344,21 @@ export const SuperAdminDashboard: React.FC = () => {
           <div className="w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-2xl">
             <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-cyan-500/10 text-cyan-500 flex items-center justify-center">
                   <Wrench className="w-4 h-4" />
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-                    Temporary Support Session
+                    {t('admin.supportSession')}
                   </h3>
                   <p className="text-[11px] text-slate-500">
-                    Zero-Password Technical Assistance Tunnel
+                    Tygos Enterprise Support Tunnel
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setSupportModalEst(null)}
-                className="text-slate-400 hover:text-slate-600 dark:hover:text-white"
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-white cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -365,20 +367,20 @@ export const SuperAdminDashboard: React.FC = () => {
             <div className="space-y-4 my-4 text-xs">
               <div className="p-3 bg-cyan-500/5 border border-cyan-500/20 rounded-xl">
                 <p className="text-slate-700 dark:text-slate-300">
-                  Target Tenant:{' '}
+                  {t('admin.tableName')}:{' '}
                   <span className="font-bold text-slate-900 dark:text-white">
                     {supportModalEst.name}
                   </span>{' '}
-                  (<span className="font-mono text-cyan-400">{supportModalEst.code}</span>)
+                  (<span className="font-mono text-cyan-600 dark:text-cyan-400" dir="ltr">{supportModalEst.code}</span>)
                 </p>
                 <p className="text-[11px] text-slate-500 mt-1">
-                  You are generating a time-bounded administrative maintenance session. No tenant credentials are exposed or requested.
+                  {t('admin.auditWarning')}
                 </p>
               </div>
 
               <div>
                 <label className="block text-slate-600 dark:text-slate-400 font-medium mb-1">
-                  Session Duration
+                  {t('admin.sessionDuration')}
                 </label>
                 <div className="grid grid-cols-4 gap-2">
                   {[15, 30, 60, 120].map((mins) => (
@@ -386,13 +388,13 @@ export const SuperAdminDashboard: React.FC = () => {
                       key={mins}
                       type="button"
                       onClick={() => setSupportDuration(mins)}
-                      className={`py-2 text-center rounded-lg border font-medium transition-colors ${
+                      className={`py-2 text-center rounded-lg border font-medium transition-colors cursor-pointer ${
                         supportDuration === mins
-                          ? 'border-cyan-500 bg-cyan-500/10 text-cyan-400'
+                          ? 'border-cyan-500 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 font-bold'
                           : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300'
                       }`}
                     >
-                      {mins} mins
+                      {mins} {t('admin.minutes')}
                     </button>
                   ))}
                 </div>
@@ -400,7 +402,7 @@ export const SuperAdminDashboard: React.FC = () => {
 
               <div>
                 <label className="block text-slate-600 dark:text-slate-400 font-medium mb-1">
-                  Mandatory Support Reason (Logged to Audit Trail) *
+                  {t('admin.supportReason')} *
                 </label>
                 <textarea
                   rows={2}
@@ -413,7 +415,7 @@ export const SuperAdminDashboard: React.FC = () => {
               <div className="p-3 bg-amber-500/5 border border-amber-500/20 rounded-xl flex items-start gap-2 text-[11px] text-amber-600 dark:text-amber-400">
                 <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
                 <span>
-                  All actions taken during this temporary support session are cryptographically signed and logged for the establishment owner’s audit compliance.
+                  {t('admin.auditWarning')}
                 </span>
               </div>
             </div>
@@ -421,16 +423,16 @@ export const SuperAdminDashboard: React.FC = () => {
             <div className="flex items-center justify-end gap-2 pt-4 border-t border-slate-200 dark:border-slate-800">
               <button
                 onClick={() => setSupportModalEst(null)}
-                className="px-4 py-2 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                className="px-4 py-2 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 onClick={handleLaunchSupport}
                 className="px-4 py-2 text-xs font-bold text-white bg-cyan-600 hover:bg-cyan-500 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer"
               >
                 <Clock className="w-3.5 h-3.5" />
-                <span>Launch {supportDuration}m Support Session</span>
+                <span>{t('admin.launchSupport')} ({supportDuration} {t('admin.minutes')})</span>
               </button>
             </div>
           </div>
@@ -443,29 +445,29 @@ export const SuperAdminDashboard: React.FC = () => {
           <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-rose-500/30 rounded-2xl p-6 shadow-2xl">
             <div className="flex items-center gap-2 text-rose-500 mb-3">
               <AlertTriangle className="w-5 h-5" />
-              <h3 className="text-sm font-bold">Strong Deletion Confirmation</h3>
+              <h3 className="text-sm font-bold">{t('admin.deleteTitle')}</h3>
             </div>
 
             <p className="text-xs text-slate-600 dark:text-slate-300 mb-4">
-              You are about to irreversibly delete{' '}
+              {t('admin.deleteWarning')}{' '}
               <span className="font-bold text-slate-900 dark:text-white">
                 {deleteModalEst.name}
               </span>
-              . This will purge all associated POS records, recipe blueprints, and employee logs.
             </p>
 
             <div className="p-3 bg-rose-500/5 border border-rose-500/20 rounded-lg text-xs mb-4">
               <p className="text-slate-500 dark:text-slate-400 mb-1">
-                Type the establishment code to confirm deletion:
+                {t('admin.typeToConfirm')}
               </p>
-              <p className="font-mono font-bold text-rose-400 text-sm">
+              <p className="font-mono font-bold text-rose-500 dark:text-rose-400 text-sm" dir="ltr">
                 {deleteModalEst.code}
               </p>
               <input
                 type="text"
-                placeholder={`Type ${deleteModalEst.code}`}
+                placeholder={deleteModalEst.code}
                 value={deleteConfirmationInput}
                 onChange={(e) => setDeleteConfirmationInput(e.target.value)}
+                dir="ltr"
                 className="w-full mt-2 px-3 py-1.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg text-xs font-mono text-slate-900 dark:text-slate-100 focus:outline-none focus:border-rose-500"
               />
             </div>
@@ -473,9 +475,9 @@ export const SuperAdminDashboard: React.FC = () => {
             <div className="flex items-center justify-end gap-2">
               <button
                 onClick={() => setDeleteModalEst(null)}
-                className="px-3 py-1.5 text-xs font-medium text-slate-500 hover:text-slate-900 dark:hover:text-white"
+                className="px-3 py-1.5 text-xs font-medium text-slate-500 hover:text-slate-900 dark:hover:text-white cursor-pointer"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 disabled={deleteConfirmationInput !== deleteModalEst.code}
@@ -483,10 +485,10 @@ export const SuperAdminDashboard: React.FC = () => {
                 className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${
                   deleteConfirmationInput === deleteModalEst.code
                     ? 'bg-rose-600 text-white hover:bg-rose-500 cursor-pointer'
-                    : 'bg-slate-800 text-slate-500 cursor-not-allowed opacity-60'
+                    : 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed opacity-60'
                 }`}
               >
-                Confirm Deletion
+                {t('admin.confirmDelete')}
               </button>
             </div>
           </div>
@@ -499,11 +501,11 @@ export const SuperAdminDashboard: React.FC = () => {
           <div className="w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
               <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-                Audit Trail · {logsModalEst.name} ({logsModalEst.code})
+                {t('admin.logs')} · {logsModalEst.name} (<span dir="ltr">{logsModalEst.code}</span>)
               </h3>
               <button
                 onClick={() => setLogsModalEst(null)}
-                className="text-slate-400 hover:text-white"
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-white cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -516,10 +518,10 @@ export const SuperAdminDashboard: React.FC = () => {
                   className="p-2.5 bg-slate-50 dark:bg-slate-950/60 rounded-lg border border-slate-200 dark:border-slate-800/80"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-cyan-500">
+                    <span className="font-semibold text-cyan-600 dark:text-cyan-400">
                       Support Session #{s.id}
                     </span>
-                    <span className="text-[10px] text-slate-400 font-mono">
+                    <span className="text-[10px] text-slate-400 font-mono" dir="ltr">
                       {s.startedAt}
                     </span>
                   </div>
@@ -531,27 +533,14 @@ export const SuperAdminDashboard: React.FC = () => {
                   </p>
                 </div>
               ))}
-              <div className="p-2.5 bg-slate-50 dark:bg-slate-950/60 rounded-lg border border-slate-200 dark:border-slate-800/80">
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-emerald-500">
-                    POS Settlement Batch #ST-441
-                  </span>
-                  <span className="text-[10px] text-slate-400 font-mono">
-                    Yesterday 23:58
-                  </span>
-                </div>
-                <p className="text-slate-600 dark:text-slate-300 mt-1">
-                  Cash drawer closed and balanced with $0 variance.
-                </p>
-              </div>
             </div>
 
             <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex justify-end">
               <button
                 onClick={() => setLogsModalEst(null)}
-                className="px-4 py-1.5 text-xs font-semibold bg-slate-200 dark:bg-slate-800 rounded-lg text-slate-700 dark:text-slate-300"
+                className="px-4 py-1.5 text-xs font-semibold bg-slate-200 dark:bg-slate-800 rounded-lg text-slate-700 dark:text-slate-300 cursor-pointer"
               >
-                Close Logs
+                {t('common.close')}
               </button>
             </div>
           </div>
