@@ -5,23 +5,39 @@
 
 import React, { useState } from 'react';
 import {
-  DollarSign,
+  Scale,
   TrendingDown,
   TrendingUp,
   AlertTriangle,
-  Scale,
-  Trash2,
-  PieChart,
-  Layers,
-  CheckCircle2,
+  FileSpreadsheet,
+  Calendar,
   Filter,
+  DollarSign,
+  PieChart,
+  Sliders,
+  Sparkles,
+  HelpCircle,
+  Lightbulb,
 } from 'lucide-react';
-import { MOCK_CONSUMPTION_VARIANCES, MOCK_COST_KPIS } from '../../data/mockData.ts';
 import { useI18n } from '../../i18n/I18nContext.tsx';
+import { useBusiness } from '../../context/BusinessContext.tsx';
+import { MOCK_COST_KPIS } from '../../data/mockData.ts';
+import { TheoreticalVsActualVariance } from '../../domain/types.ts';
 
 export const CostControlModule: React.FC = () => {
-  const { t, formatCurrency, formatNumber } = useI18n();
+  const { t, formatCurrency, formatNumber, language } = useI18n();
+  const {
+    consumptionVariances,
+    setIsSimulationModalOpen,
+    setIsAssistantOpen,
+    sendAssistantQuery,
+  } = useBusiness();
   const [selectedCostCenter, setSelectedCostCenter] = useState<string>('All');
+  const [selectedVariance, setSelectedVariance] = useState<TheoreticalVsActualVariance | null>(
+    consumptionVariances[0] || null
+  );
+
+  const isAr = language === 'ar';
 
   const costCenters = [
     { name: t('common.all'), code: 'ALL' },
@@ -45,10 +61,23 @@ export const CostControlModule: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-500 border border-amber-500/20 font-semibold flex items-center gap-1.5">
-            <AlertTriangle className="w-3.5 h-3.5" />
-            <span>{t('cost.varianceValue')}</span>
-          </span>
+          <button
+            onClick={() => setIsSimulationModalOpen(true)}
+            className="px-3.5 py-2 text-xs font-semibold rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+          >
+            <Sliders className="w-4 h-4" />
+            <span>{isAr ? 'محاكاة التكلفة (What-If)' : 'Cost Simulation'}</span>
+          </button>
+          <button
+            onClick={() => {
+              setIsAssistantOpen(true);
+              sendAssistantQuery(isAr ? 'ليه الـ Food Cost زاد؟' : 'Why did food cost increase?');
+            }}
+            className="px-3.5 py-2 text-xs font-semibold rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer"
+          >
+            <Sparkles className="w-4 h-4 text-cyan-500" />
+            <span>{isAr ? 'تحليل الذكاء التشغيلي' : 'AI Analysis'}</span>
+          </button>
         </div>
       </div>
 
@@ -99,7 +128,9 @@ export const CostControlModule: React.FC = () => {
               {t('cost.theoreticalVsActual')}
             </h3>
             <p className="text-[11px] text-slate-500">
-              {t('dashboard.traceabilityTitle')}
+              {isAr
+                ? 'مقارنة استهلاك المبيعات النظري (الوصفات) بالصرف الفعلي من المستودع وتشخيص أسباب الانحراف.'
+                : 'Comparing theoretical POS sales recipe consumption with actual warehouse stock issues.'}
             </p>
           </div>
 
@@ -131,63 +162,113 @@ export const CostControlModule: React.FC = () => {
                 <th className="py-3 px-3 text-end">{t('cost.varianceQty')}</th>
                 <th className="py-3 px-3 text-end">{t('cost.varianceValue')}</th>
                 <th className="py-3 px-3 text-end">{t('cost.waste')}</th>
-                <th className="py-3 px-3 text-end">{t('cost.yield')}</th>
-                <th className="py-3 px-4 text-center">{t('common.status')}</th>
+                <th className="py-3 px-4 text-center">{isAr ? 'التشخيص والتوصية' : 'Diagnosis'}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
-              {MOCK_CONSUMPTION_VARIANCES.map((v) => (
-                <tr
-                  key={v.ingredientId}
-                  className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors"
-                >
-                  <td className="py-3 px-4 font-semibold text-slate-900 dark:text-slate-200 text-start">
-                    {v.name}
-                  </td>
-                  <td className="py-3 px-3 font-mono text-slate-500 text-start">
-                    {v.unit}
-                  </td>
-                  <td className="py-3 px-3 text-end font-mono text-slate-700 dark:text-slate-300" dir="ltr">
-                    {v.theoreticalConsumption}
-                  </td>
-                  <td className="py-3 px-3 text-end font-mono text-slate-700 dark:text-slate-300" dir="ltr">
-                    {v.actualConsumption}
-                  </td>
-                  <td className="py-3 px-3 text-end font-mono font-bold text-amber-500" dir="ltr">
-                    +{v.varianceQuantity}
-                  </td>
-                  <td className="py-3 px-3 text-end font-mono font-bold text-rose-500" dir="ltr">
-                    {formatCurrency(v.varianceValue)}
-                  </td>
-                  <td className="py-3 px-3 text-end font-mono text-slate-500" dir="ltr">
-                    {v.wasteQuantity} {v.unit}
-                  </td>
-                  <td className="py-3 px-3 text-end font-mono text-cyan-600 dark:text-cyan-400 font-semibold">
-                    {v.yieldPercent}%
-                  </td>
-                  <td className="py-3 px-4 text-center">
-                    <span
-                      className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-                        v.status === 'normal'
-                          ? 'bg-emerald-500/10 text-emerald-500'
-                          : v.status === 'warning'
-                          ? 'bg-amber-500/10 text-amber-500'
-                          : 'bg-rose-500/10 text-rose-500 border border-rose-500/30'
-                      }`}
-                    >
-                      {v.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
+              {consumptionVariances.map((v) => {
+                const isSelected = selectedVariance?.ingredientId === v.ingredientId;
+                return (
+                  <tr
+                    key={v.ingredientId}
+                    onClick={() => setSelectedVariance(v)}
+                    className={`cursor-pointer transition-colors ${
+                      isSelected
+                        ? 'bg-cyan-50/70 dark:bg-cyan-950/40'
+                        : 'hover:bg-slate-50 dark:hover:bg-slate-800/30'
+                    }`}
+                  >
+                    <td className="py-3 px-4 font-semibold text-slate-900 dark:text-slate-200 text-start">
+                      {isAr ? v.ingredientNameAr : v.ingredientNameEn}
+                    </td>
+                    <td className="py-3 px-3 font-mono text-slate-500 text-start">
+                      {v.unit}
+                    </td>
+                    <td className="py-3 px-3 text-end font-mono text-slate-700 dark:text-slate-300" dir="ltr">
+                      {v.theoreticalConsumption}
+                    </td>
+                    <td className="py-3 px-3 text-end font-mono text-slate-700 dark:text-slate-300" dir="ltr">
+                      {v.actualConsumption}
+                    </td>
+                    <td className="py-3 px-3 text-end font-mono font-bold text-amber-500" dir="ltr">
+                      +{v.varianceQuantity.toFixed(1)}
+                    </td>
+                    <td className="py-3 px-3 text-end font-mono font-bold text-rose-500" dir="ltr">
+                      {formatCurrency(v.varianceCostValue)}
+                    </td>
+                    <td className="py-3 px-3 text-end font-mono text-slate-500" dir="ltr">
+                      {v.recordedWasteQuantity} {v.unit}
+                    </td>
+                    <td className="py-3 px-4 text-center">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-rose-500/15 text-rose-500 border border-rose-500/30">
+                        {v.potentialCauses[0]?.cause.replace('_', ' ') || 'Variance'}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
 
-        <div className="p-3 bg-slate-50 dark:bg-slate-950/40 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500">
-          <span>{t('cost.subtitle')}</span>
-          <span className="font-mono text-rose-500 font-medium" dir="ltr">Net Variance Impact: -$596.80</span>
-        </div>
+        {/* Selected Variance Root Cause Deep Dive Card */}
+        {selectedVariance && (
+          <div className="p-4 bg-slate-50 dark:bg-slate-950/80 border-t border-slate-200 dark:border-slate-800 space-y-3 text-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <Lightbulb className="w-4 h-4 text-amber-500" />
+                <span className="font-bold text-slate-900 dark:text-white">
+                  {isAr ? 'تحليل الأسباب المحتملة للانحراف:' : 'Variance Potential Root Causes:'}{' '}
+                  {isAr ? selectedVariance.ingredientNameAr : selectedVariance.ingredientNameEn}
+                </span>
+              </div>
+              <span className="font-mono text-rose-500 font-bold" dir="ltr">
+                Impact: {formatCurrency(selectedVariance.varianceCostValue)} (+{selectedVariance.variancePercentage.toFixed(1)}%)
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {selectedVariance.potentialCauses.map((pc, idx) => (
+                <div
+                  key={idx}
+                  className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800/80 space-y-1"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-slate-800 dark:text-slate-200 uppercase font-mono text-[10px]">
+                      {pc.cause.replace('_', ' ')}
+                    </span>
+                    <span className="font-mono font-bold text-cyan-500 text-[11px]" dir="ltr">
+                      {pc.probabilityScore}% Probability
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 leading-relaxed">
+                    {isAr ? pc.evidenceNotesAr : pc.evidenceNotesEn}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <div className="p-3 bg-cyan-50 dark:bg-cyan-950/30 rounded-xl border border-cyan-200 dark:border-cyan-500/30 text-slate-700 dark:text-cyan-300 text-[11px] flex items-center justify-between">
+              <span>
+                <strong>{isAr ? 'الإجراء الرقابي الموصى به:' : 'Recommended Action:'}</strong>{' '}
+                {isAr ? selectedVariance.recommendedAuditActionAr : selectedVariance.recommendedAuditActionEn}
+              </span>
+              <button
+                onClick={() => {
+                  setIsAssistantOpen(true);
+                  sendAssistantQuery(
+                    isAr
+                      ? `ما هو سبب انحراف استهلاك ${selectedVariance.ingredientNameAr}؟`
+                      : `Why is there variance in ${selectedVariance.ingredientNameEn}?`
+                  );
+                }}
+                className="px-2.5 py-1 rounded-md bg-cyan-600 text-white font-bold text-[10px] cursor-pointer hover:bg-cyan-500 shrink-0 ms-2"
+              >
+                {isAr ? 'اسأل TYGOS' : 'Ask TYGOS'}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

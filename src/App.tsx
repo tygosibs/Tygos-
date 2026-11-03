@@ -8,6 +8,7 @@ import { ThemeProvider } from './theme/ThemeContext.tsx';
 import { I18nProvider } from './i18n/I18nContext.tsx';
 import { SyncProvider } from './sync/SyncContext.tsx';
 import { AuthProvider, useAuth } from './context/AuthContext.tsx';
+import { BusinessProvider } from './context/BusinessContext.tsx';
 import { AppLayout } from './components/layout/AppLayout.tsx';
 import { LoginView } from './components/auth/LoginView.tsx';
 import { RegisterWizard } from './components/auth/RegisterWizard.tsx';
@@ -24,6 +25,11 @@ import { HrModule } from './components/hr/HrModule.tsx';
 import { CrmModule } from './components/crm/CrmModule.tsx';
 import { InternalChatModule } from './components/chat/InternalChatModule.tsx';
 import { GlobalSearchModal } from './components/search/GlobalSearchModal.tsx';
+import { TygosAssistantModal } from './components/ai/TygosAssistantModal.tsx';
+import { CostSimulationWorkspace } from './components/costcontrol/CostSimulationWorkspace.tsx';
+import { PrivilegedAccessModal } from './components/security/PrivilegedAccessModal.tsx';
+import { AuditReportModal } from './components/security/AuditReportModal.tsx';
+import { HelpCenterModal } from './components/help/HelpCenterModal.tsx';
 
 const AppContent: React.FC = () => {
   const { currentUser, activeView, setActiveView } = useAuth();
@@ -71,6 +77,11 @@ const AppContent: React.FC = () => {
   return (
     <AppLayout>
       <GlobalSearchModal />
+      <TygosAssistantModal />
+      <CostSimulationWorkspace />
+      <PrivilegedAccessModal />
+      <AuditReportModal />
+      <HelpCenterModal />
       {renderActiveView()}
     </AppLayout>
   );
@@ -82,7 +93,9 @@ export default function App() {
       <I18nProvider>
         <SyncProvider>
           <AuthProvider>
-            <AppContent />
+            <BusinessProvider>
+              <AppContent />
+            </BusinessProvider>
           </AuthProvider>
         </SyncProvider>
       </I18nProvider>
